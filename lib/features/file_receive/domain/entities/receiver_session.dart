@@ -1,15 +1,34 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'receiver_session.freezed.dart';
+import 'package:equatable/equatable.dart';
 
 enum ReceiverSessionStatus { waiting, attached, expired }
 
-@freezed
-abstract class ReceiverSession with _$ReceiverSession {
-  const factory ReceiverSession({
-    required String id,
-    required ReceiverSessionStatus status,
+class ReceiverSession extends Equatable {
+  final String id;
+  final ReceiverSessionStatus status;
+  final String? transferId;
+  final int? expiresMultiplier;
+
+  const ReceiverSession({
+    required this.id,
+    required this.status,
+    this.transferId,
+    this.expiresMultiplier,
+  });
+
+  ReceiverSession copyWith({
+    String? id,
+    ReceiverSessionStatus? status,
     String? transferId,
     int? expiresMultiplier,
-  }) = _ReceiverSession;
+  }) {
+    return ReceiverSession(
+      id: id ?? this.id,
+      status: status ?? this.status,
+      transferId: transferId ?? this.transferId,
+      expiresMultiplier: expiresMultiplier ?? this.expiresMultiplier,
+    );
+  }
+
+  @override
+  List<Object?> get props => [id, status, transferId, expiresMultiplier];
 }

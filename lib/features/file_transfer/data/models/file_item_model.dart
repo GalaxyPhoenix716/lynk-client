@@ -1,22 +1,62 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/file_item.dart';
 
-part 'file_item_model.freezed.dart';
-part 'file_item_model.g.dart';
+class FileItemModel extends FileItem {
+  const FileItemModel({
+    required super.id,
+    required super.name,
+    required super.size,
+    required super.contentType,
+    required super.status,
+    super.uploadUrl,
+    super.downloadUrl,
+  });
 
-@freezed
-abstract class FileItemModel with _$FileItemModel {
-  const factory FileItemModel({
-    @JsonKey(name: 'file_id') required String id,
-    @JsonKey(name: 'file_name') required String name,
-    @JsonKey(name: 'file_size') required int size,
-    @JsonKey(name: 'content_type') required String contentType,
-    required FileStatus status,
-    @JsonKey(name: 'upload_url') String? uploadUrl,
-    @JsonKey(name: 'download_url') String? downloadUrl,
-  }) = _FileItemModel;
+  factory FileItemModel.fromJson(Map<String, dynamic> json) {
+    FileStatus parseStatus(String? statusStr) {
+      switch (statusStr) {
+        case 'uploaded':
+          return FileStatus.uploaded;
+        case 'failed':
+          return FileStatus.failed;
+        case 'pending':
+        default:
+          return FileStatus.pending;
+      }
+    }
 
-  factory FileItemModel.fromJson(Map<String, dynamic> json) => _$FileItemModelFromJson(json);
+    return FileItemModel(
+      id: json['file_id'] as String? ?? '',
+      name: json['file_name'] as String? ?? '',
+      size: json['file_size'] as int? ?? 0,
+      contentType: json['content_type'] as String? ?? '',
+      status: parseStatus(json['status'] as String?),
+      uploadUrl: json['upload_url'] as String?,
+      downloadUrl: json['download_url'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    String statusString(FileStatus s) {
+      switch (s) {
+        case FileStatus.uploaded:
+          return 'uploaded';
+        case FileStatus.failed:
+          return 'failed';
+        case FileStatus.pending:
+          return 'pending';
+      }
+    }
+
+    return {
+      'file_id': id,
+      'file_name': name,
+      'file_size': size,
+      'content_type': contentType,
+      'status': statusString(status),
+      if (uploadUrl != null) 'upload_url': uploadUrl,
+      if (downloadUrl != null) 'download_url': downloadUrl,
+    };
+  }
 
   factory FileItemModel.fromEntity(FileItem entity) {
     return FileItemModel(
@@ -27,19 +67,6 @@ abstract class FileItemModel with _$FileItemModel {
       status: entity.status,
       uploadUrl: entity.uploadUrl,
       downloadUrl: entity.downloadUrl,
-    );
-  }
-}
-extension FileItemModelX on FileItemModel {
-  FileItem toEntity() {
-    return FileItem(
-      id: id,
-      name: name,
-      size: size,
-      contentType: contentType,
-      status: status,
-      uploadUrl: uploadUrl,
-      downloadUrl: downloadUrl,
     );
   }
 }

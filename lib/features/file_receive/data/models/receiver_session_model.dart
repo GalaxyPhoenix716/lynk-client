@@ -1,19 +1,53 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/receiver_session.dart';
 
-part 'receiver_session_model.freezed.dart';
-part 'receiver_session_model.g.dart';
+class ReceiverSessionModel extends ReceiverSession {
+  const ReceiverSessionModel({
+    required super.id,
+    required super.status,
+    super.transferId,
+    super.expiresMultiplier,
+  });
 
-@freezed
-abstract class ReceiverSessionModel with _$ReceiverSessionModel {
-  const factory ReceiverSessionModel({
-    @JsonKey(name: 'session_id') required String id,
-    required ReceiverSessionStatus status,
-    @JsonKey(name: 'transfer_id') String? transferId,
-    @JsonKey(name: 'expires_in') int? expiresMultiplier,
-  }) = _ReceiverSessionModel;
+  factory ReceiverSessionModel.fromJson(Map<String, dynamic> json) {
+    ReceiverSessionStatus parseStatus(String? statusStr) {
+      switch (statusStr) {
+        case 'attached':
+          return ReceiverSessionStatus.attached;
+        case 'expired':
+          return ReceiverSessionStatus.expired;
+        case 'waiting':
+        default:
+          return ReceiverSessionStatus.waiting;
+      }
+    }
 
-  factory ReceiverSessionModel.fromJson(Map<String, dynamic> json) => _$ReceiverSessionModelFromJson(json);
+    return ReceiverSessionModel(
+      id: json['session_id'] as String? ?? '',
+      status: parseStatus(json['status'] as String?),
+      transferId: json['transfer_id'] as String?,
+      expiresMultiplier: json['expires_in'] as int? ?? json['expires_at_seconds'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    String statusString(ReceiverSessionStatus s) {
+      switch (s) {
+        case ReceiverSessionStatus.attached:
+          return 'attached';
+        case ReceiverSessionStatus.expired:
+          return 'expired';
+        case ReceiverSessionStatus.waiting:
+          return 'waiting';
+      }
+    }
+
+    return {
+      'session_id': id,
+      'status': statusString(status),
+      if (transferId != null) 'transfer_id': transferId,
+      if (expiresMultiplier != null) 'expires_in': expiresMultiplier,
+    };
+  }
 
   factory ReceiverSessionModel.fromEntity(ReceiverSession entity) {
     return ReceiverSessionModel(
@@ -21,17 +55,6 @@ abstract class ReceiverSessionModel with _$ReceiverSessionModel {
       status: entity.status,
       transferId: entity.transferId,
       expiresMultiplier: entity.expiresMultiplier,
-    );
-  }
-}
-
-extension ReceiverSessionModelX on ReceiverSessionModel {
-  ReceiverSession toEntity() {
-    return ReceiverSession(
-      id: id,
-      status: status,
-      transferId: transferId,
-      expiresMultiplier: expiresMultiplier,
     );
   }
 }
