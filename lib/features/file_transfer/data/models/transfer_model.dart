@@ -1,69 +1,22 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../domain/entities/transfer.dart';
 import 'file_item_model.dart';
 
-class TransferModel extends Transfer {
-  const TransferModel({
-    required super.id,
-    required super.status,
-    required super.totalFiles,
-    required super.totalSize,
-    super.expiresMultiplier,
-    required super.files,
-  });
+part 'transfer_model.freezed.dart';
+part 'transfer_model.g.dart';
 
-  factory TransferModel.fromJson(Map<String, dynamic> json) {
-    TransferStatus parseStatus(String? statusStr) {
-      switch (statusStr) {
-        case 'ready':
-          return TransferStatus.ready;
-        case 'expired':
-          return TransferStatus.expired;
-        case 'cancelled':
-          return TransferStatus.cancelled;
-        case 'uploading':
-        default:
-          return TransferStatus.uploading;
-      }
-    }
+@freezed
+abstract class TransferModel with _$TransferModel {
+  const factory TransferModel({
+    @JsonKey(name: 'transfer_id') required String id,
+    required TransferStatus status,
+    @JsonKey(name: 'total_files') required int totalFiles,
+    @JsonKey(name: 'total_size') required int totalSize,
+    @JsonKey(name: 'expires_in') int? expiresMultiplier,
+    required List<FileItemModel> files,
+  }) = _TransferModel;
 
-    final filesList = json['files'] as List<dynamic>? ?? [];
-    final parsedFiles = filesList
-        .map((f) => FileItemModel.fromJson(f as Map<String, dynamic>))
-        .toList();
-
-    return TransferModel(
-      id: json['transfer_id'] as String? ?? '',
-      status: parseStatus(json['status'] as String?),
-      totalFiles: json['total_files'] as int? ?? parsedFiles.length,
-      totalSize: json['total_size'] as int? ?? 0,
-      expiresMultiplier: json['expires_in'] as int? ?? json['expires_at_seconds'] as int?,
-      files: parsedFiles,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    String statusString(TransferStatus s) {
-      switch (s) {
-        case TransferStatus.ready:
-          return 'ready';
-        case TransferStatus.expired:
-          return 'expired';
-        case TransferStatus.cancelled:
-          return 'cancelled';
-        case TransferStatus.uploading:
-          return 'uploading';
-      }
-    }
-
-    return {
-      'transfer_id': id,
-      'status': statusString(status),
-      'total_files': totalFiles,
-      'total_size': totalSize,
-      if (expiresMultiplier != null) 'expires_in': expiresMultiplier,
-      'files': files.map((f) => FileItemModel.fromEntity(f).toJson()).toList(),
-    };
-  }
+  factory TransferModel.fromJson(Map<String, dynamic> json) => _$TransferModelFromJson(json);
 
   factory TransferModel.fromEntity(Transfer entity) {
     return TransferModel(
@@ -72,7 +25,20 @@ class TransferModel extends Transfer {
       totalFiles: entity.totalFiles,
       totalSize: entity.totalSize,
       expiresMultiplier: entity.expiresMultiplier,
-      files: entity.files,
+      files: entity.files.map((f) => FileItemModel.fromEntity(f)).toList(),
+    );
+  }
+}
+
+extension TransferModelX on TransferModel {
+  Transfer toEntity() {
+    return Transfer(
+      id: id,
+      status: status,
+      totalFiles: totalFiles,
+      totalSize: totalSize,
+      expiresMultiplier: expiresMultiplier,
+      files: files.map((f) => f.toEntity()).toList(),
     );
   }
 }

@@ -1,11 +1,19 @@
-import 'package:equatable/equatable.dart';
-
-abstract class Failure extends Equatable {
+class Failure {
   final String message;
   const Failure(this.message);
 
   @override
-  List<Object?> get props => [message];
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Failure &&
+          runtimeType == other.runtimeType &&
+          message == other.message;
+
+  @override
+  int get hashCode => message.hashCode;
+
+  @override
+  String toString() => '$runtimeType: $message';
 }
 
 class ServerFailure extends Failure {
@@ -13,7 +21,13 @@ class ServerFailure extends Failure {
   const ServerFailure(super.message, {this.statusCode});
 
   @override
-  List<Object?> get props => [message, statusCode];
+  bool operator ==(Object other) =>
+      super == other &&
+      other is ServerFailure &&
+      statusCode == other.statusCode;
+
+  @override
+  int get hashCode => Object.hash(super.hashCode, statusCode);
 }
 
 class NetworkFailure extends Failure {
