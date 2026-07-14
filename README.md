@@ -1,17 +1,111 @@
-# client
+# Lynk — Cross-Device File Transfer App (Client)
 
-A new Flutter project.
+<p align="center">
+  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" />
+  <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white" alt="Dart" />
+  <img src="https://img.shields.io/badge/Riverpod-4A154B?style=for-the-badge" alt="Riverpod" />
+  <img src="https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge" alt="License" />
+</p>
 
-## Getting Started
+Lynk is a minimal, login-free, cross-device file transfer mobile application built with Flutter. It allows users to select multiple files on one device and securely transfer them to another device by scanning a temporary, secure QR code. Files are encrypted on-device prior to upload, ensuring absolute privacy.
 
-This project is a starting point for a Flutter application.
+Files are uploaded directly to **Cloudflare R2** via short-lived presigned URLs, and session/transfer metadata is stored in **Redis** with strict TTL-based expiration.
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Features
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+* **Zero Login/Sign-up:** Open the app, pick your files, and start transferring instantly.
+* **End-to-End Encryption (E2EE):** Files are encrypted on-device before uploading and decrypted only on the receiver's device, ensuring that not even the server operator or Cloudflare can read their contents.
+* **Multi-File Support:** Select, preview, and remove multiple files in a single transfer.
+* **Direct R2 Uploads/Downloads:** File bytes stream directly between the client and Cloudflare R2 storage without proxying through the app server.
+* **Secure QR Flows:**
+  1. **Sender QR Flow (Primary):** Upload files $\rightarrow$ generate QR code $\rightarrow$ scan to download.
+  2. **Receiver QR Flow:** Receiver generates session QR $\rightarrow$ Sender scans $\rightarrow$ Sender uploads $\rightarrow$ Receiver downloads.
+* **Byte-Weighted Progress:** Real-time upload and download progress accurately calculated using file size weights.
+* **Premium UX/UI:** Designed with a sleek slate-indigo dark theme and glassmorphic card elements.
+
+---
+
+## 🛠️ Architecture & Folder Structure
+
+The client codebase is structured following **Clean Architecture** principles grouped by **Feature** to enforce separation of concerns, testability, and scalability.
+
+```text
+lib/
+├── core/
+│   ├── theme/           # App styles, typography, and premium dark mode theme
+│   ├── network/         # ApiClient (Dio client with timeout and log interceptor)
+│   ├── errors/          # Custom Failure classes & Result monad wrapper
+│   └── utils/           # Shared helpers (e.g., FileSizeFormatter)
+│
+└── features/
+    ├── file_transfer/   # Sender Flow: File selection, uploading, & QR generation
+    │   ├── domain/      # Entities and abstract repository contracts
+    │   ├── data/        # JSON Models, DataSources, and Repository implementations
+    │   └── presentation/# Riverpod controllers, widgets, and screen layouts
+    │
+    └── file_receive/    # Receiver Flow: QR scanning & file downloading
+        ├── domain/      # Entities and abstract repository contracts
+        ├── data/        # JSON Models, DataSources, and Repository implementations
+        └── presentation/# Riverpod controllers, widgets, and screen layouts
+```
+
+### Clean Architecture Rules:
+1. **Domain Layer:** Independent of external frameworks, libraries, and the Data layer. It holds the pure business logic (**Entities** and **Repository contracts**).
+2. **Data Layer:** Handles data retrieval and serialization. It implements repository contracts, maps raw responses to entities, and connects to remote API sources.
+3. **Presentation Layer:** Manages application state via **Riverpod Notifiers** and builds responsive, beautiful user interfaces.
+
+---
+
+## Tech Stack & Dependencies
+
+* **State Management:** `flutter_riverpod` (Simple, reactive state architecture)
+* **HTTP Client:** `dio` (With custom timeouts, logs, and upload/download progress streaming)
+* **File Picker:** `file_picker` (For multi-file selection)
+* **QR Utilities:** `qr_flutter` (QR code generation) & `mobile_scanner` (Fast camera-based QR scanning)
+* **File Opener:** `open_filex` (To open downloaded files on device)
+* **Equality Helper:** `equatable` (For type-safe equality value checking without boilerplates)
+
+---
+
+## 🏁 Getting Started
+
+### Prerequisites
+* Flutter SDK (version `^3.12.2` or later)
+* Android SDK or Xcode (for iOS development)
+
+### Local Configuration
+1. Clone the repository and navigate to the client folder.
+2. Create a `.env` file in the root of the client directory:
+   ```env
+   API_BASE_URL=http://localhost:8000/api/v1
+   ```
+   *(Note: For Android Emulators, use `http://10.0.2.2:8000/api/v1` to point to your local machine backend).*
+
+### Commands
+* **Fetch Dependencies:**
+  ```bash
+  flutter pub get
+  ```
+* **Run Linter:**
+  ```bash
+  flutter analyze
+  ```
+* **Run Tests:**
+  ```bash
+  flutter test
+  ```
+* **Run App (Local Development):**
+  ```bash
+  flutter run
+  ```
+
+---
+
+## Security & Performance Guidelines
+
+* **Zero-Knowledge Encryption:** Cryptographic keys are generated on-device and shared only via the QR code. Files remain fully encrypted in transit and at rest on R2 storage.
+* **Secure Keys:** Never store Cloudflare R2 bucket credentials or private secrets on the client. All upload and download URLs are presigned and short-lived.
+* **Low Memory Footprint:** Files are streamed during upload (`File.openRead()`) and download instead of being loaded fully into memory.
+* **Abuse Controls:** File counts, total sizes, and rates are authoritatively checked on the backend and mapped to friendly, descriptive error widgets on the client.
