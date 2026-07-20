@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -6,9 +5,7 @@ part 'onboarding_provider.g.dart';
 
 @riverpod
 SharedPreferences sharedPreferences(Ref ref) {
-  throw UnimplementedError(
-    'Override sharedPreferencesProvider in main() via ProviderScope',
-  );
+  throw UnimplementedError('Override sharedPreferencesProvider in main() via ProviderScope');
 }
 
 @riverpod
