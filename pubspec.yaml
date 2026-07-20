@@ -1,6 +1,6 @@
 name: client
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
@@ -24,7 +24,12 @@ dependencies:
   shared_preferences: ^2.5.5
   permission_handler: ^12.0.3
   smooth_page_indicator: ^2.0.1
+
 dev_dependencies:
+  riverpod_annotation: ^4.0.3
+  riverpod_generator: ^4.0.4
+  build_runner: ^2.15.1
+
   flutter_test:
     sdk: flutter
 
