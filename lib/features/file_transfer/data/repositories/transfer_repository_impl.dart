@@ -1,3 +1,7 @@
+import 'package:client/core/errors/failures.dart';
+import 'package:client/features/file_transfer/data/models/file_item_model.dart';
+import 'package:dio/dio.dart';
+
 import '../../../../core/errors/result.dart';
 import '../../domain/entities/file_item.dart';
 import '../../domain/entities/transfer.dart';
@@ -11,8 +15,20 @@ class TransferRepositoryImpl implements TransferRepository {
 
   @override
   Future<Result<Transfer>> createTransfer(List<FileItem> files) async {
-    // TODO: implement createTransfer
-    throw UnimplementedError();
+    try {
+      final models = files.map((f) => FileItemModel.fromEntity(f)).toList();
+      final result = await remoteDataSource.createTransfer(models);
+      return Result.success(result);
+    } on DioException catch (e) {
+      return Result.failure(
+        ServerFailure(
+          e.response?.data['detail'] ?? 'Failed to create transfer',
+          statusCode: e.response?.statusCode,
+        ),
+      );
+    } catch (e) {
+      return Result.failure(ServerFailure(e.toString()));
+    }
   }
 
   @override
@@ -20,14 +36,32 @@ class TransferRepositoryImpl implements TransferRepository {
     required String transferId,
     required String fileId,
   }) async {
-    // TODO: implement completeFileUpload
-    throw UnimplementedError();
+    try {
+      await remoteDataSource.completeFileUpload(
+        transferId: transferId,
+        fileId: fileId,
+      );
+      return Result.success(null);
+    } catch (e) {
+      return Result.failure(ServerFailure(e.toString()));
+    }
   }
 
   @override
   Future<Result<Transfer>> getTransferMetadata(String transferId) async {
-    // TODO: implement getTransferMetadata
-    throw UnimplementedError();
+    try {
+      final result = await remoteDataSource.getTransferMetadata(transferId);
+      return Result.success(result);
+    } on DioException catch (e) {
+      return Result.failure(
+        ServerFailure(
+          e.response?.data['detail'] ?? 'Transfer not found',
+          statusCode: e.response?.statusCode,
+        ),
+      );
+    } catch (e) {
+      return Result.failure(ServerFailure(e.toString()));
+    }
   }
 
   @override
@@ -35,13 +69,24 @@ class TransferRepositoryImpl implements TransferRepository {
     required String transferId,
     List<String>? fileIds,
   }) async {
-    // TODO: implement getDownloadUrls
-    throw UnimplementedError();
+    try {
+      final result = await remoteDataSource.getDownloadUrls(
+        transferId: transferId,
+        fileIds: fileIds,
+      );
+      return Result.success(result);
+    } catch (e) {
+      return Result.failure(ServerFailure(e.toString()));
+    }
   }
 
   @override
   Future<Result<void>> cancelTransfer(String transferId) async {
-    // TODO: implement cancelTransfer
-    throw UnimplementedError();
+    try {
+      await remoteDataSource.cancelTransfer(transferId);
+      return Result.success(null);
+    } catch (e) {
+      return Result.failure(ServerFailure(e.toString()));
+    }
   }
 }
