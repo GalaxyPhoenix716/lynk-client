@@ -1,5 +1,6 @@
-
 import 'package:client/features/file_transfer/data/datasources/transfer_remote_data_source.dart';
+import 'package:client/features/file_transfer/data/models/file_item_model.dart';
+import 'package:client/features/file_transfer/data/models/transfer_model.dart';
 import 'package:dio/dio.dart';
 
 class TransferRemoteDataSourceImpl implements TransferRemoteDataSource {

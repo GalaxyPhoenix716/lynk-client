@@ -1,4 +1,5 @@
-
+import 'package:client/features/file_transfer/data/models/file_item_model.dart';
+import 'package:client/features/file_transfer/data/models/transfer_model.dart';
 
 abstract class TransferRemoteDataSource {
   Future<TransferModel> createTransfer(List<FileItemModel> files);
@@ -16,10 +17,4 @@ abstract class TransferRemoteDataSource {
   });
 
   Future<void> cancelTransfer(String transferId);
-}
-
-class FileItemModel {
-}
-
-class TransferModel {
 }
