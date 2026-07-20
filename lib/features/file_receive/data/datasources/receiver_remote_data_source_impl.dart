@@ -1,22 +1,21 @@
+import 'package:client/features/file_receive/data/models/receiver_session_model.dart';
 import 'package:dio/dio.dart';
-import '../models/receiver_session_model.dart';
 import 'receiver_remote_data_source.dart';
 
 class ReceiverRemoteDataSourceImpl implements ReceiverRemoteDataSource {
   final Dio dio;
-
   ReceiverRemoteDataSourceImpl({required this.dio});
 
   @override
   Future<ReceiverSessionModel> createReceiverSession() async {
-    // TODO: implement createReceiverSession via POST /receiver-sessions
-    throw UnimplementedError();
+    final response = await dio.post('/receiver-sessions');
+    return ReceiverSessionModel.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
   Future<ReceiverSessionModel> getReceiverSession(String sessionId) async {
-    // TODO: implement getReceiverSession via GET /receiver-sessions/{session_id}
-    throw UnimplementedError();
+    final response = await dio.get('/receiver-sessions/$sessionId');
+    return ReceiverSessionModel.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
@@ -24,13 +23,14 @@ class ReceiverRemoteDataSourceImpl implements ReceiverRemoteDataSource {
     required String sessionId,
     required String transferId,
   }) async {
-    // TODO: implement attachTransfer via POST /receiver-sessions/{session_id}/attach-transfer
-    throw UnimplementedError();
+    await dio.post(
+      '/receiver-sessions/$sessionId/attach-transfer',
+      data: {'transfer_id': transferId},
+    );
   }
 
   @override
   Future<void> cancelReceiverSession(String sessionId) async {
-    // TODO: implement cancelReceiverSession via DELETE /receiver-sessions/{session_id}
-    throw UnimplementedError();
+    await dio.delete('/receiver-sessions/$sessionId');
   }
 }
