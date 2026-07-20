@@ -10,8 +10,11 @@ class TransferRemoteDataSourceImpl implements TransferRemoteDataSource {
 
   @override
   Future<TransferModel> createTransfer(List<FileItemModel> files) async {
-    // TODO: implement createTransfer via POST /transfers
-    throw UnimplementedError();
+    final response = await dio.post(
+      '/transfers',
+      data: {'files': files.map((f) => f.toJson()).toList()},
+    );
+    return TransferModel.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
@@ -19,14 +22,13 @@ class TransferRemoteDataSourceImpl implements TransferRemoteDataSource {
     required String transferId,
     required String fileId,
   }) async {
-    // TODO: implement completeFileUpload via POST /transfers/{transfer_id}/files/{file_id}/complete
-    throw UnimplementedError();
+    await dio.post('/transfers/$transferId/files/$fileId/complete');
   }
 
   @override
   Future<TransferModel> getTransferMetadata(String transferId) async {
-    // TODO: implement getTransferMetadata via GET /transfers/{transfer_id}
-    throw UnimplementedError();
+    final response = await dio.get('/transfers/$transferId');
+    return TransferModel.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
@@ -34,13 +36,18 @@ class TransferRemoteDataSourceImpl implements TransferRemoteDataSource {
     required String transferId,
     List<String>? fileIds,
   }) async {
-    // TODO: implement getDownloadUrls via POST /transfers/{transfer_id}/downloads
-    throw UnimplementedError();
+    final response = await dio.post(
+      '/transfers/$transferId/downloads',
+      data: fileIds != null && fileIds.isNotEmpty ? {'file_ids': fileIds} : {},
+    );
+    final list = response.data['files'] as List<dynamic>;
+    return list
+        .map((item) => FileItemModel.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
   @override
   Future<void> cancelTransfer(String transferId) async {
-    // TODO: implement cancelTransfer via DELETE /transfers/{transfer_id}
-    throw UnimplementedError();
+    await dio.delete('/transfers/$transferId');
   }
 }
