@@ -25,7 +25,8 @@ class ReceiverSessionModel extends ReceiverSession {
       id: json['session_id'] as String? ?? '',
       status: parseStatus(json['status'] as String?),
       transferId: json['transfer_id'] as String?,
-      expiresMultiplier: json['expires_in'] as int? ?? json['expires_at_seconds'] as int?,
+      expiresMultiplier:
+          json['expires_in'] as int? ?? json['expires_at_seconds'] as int?,
     );
   }
 

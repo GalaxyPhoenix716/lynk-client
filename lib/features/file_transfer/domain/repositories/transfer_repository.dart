@@ -4,7 +4,7 @@ import '../entities/transfer.dart';
 
 abstract class TransferRepository {
   Future<Result<Transfer>> createTransfer(List<FileItem> files);
-  
+
   Future<Result<void>> completeFileUpload({
     required String transferId,
     required String fileId,

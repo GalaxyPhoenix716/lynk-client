@@ -39,5 +39,12 @@ class Transfer extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, status, totalFiles, totalSize, expiresMultiplier, files];
+  List<Object?> get props => [
+    id,
+    status,
+    totalFiles,
+    totalSize,
+    expiresMultiplier,
+    files,
+  ];
 }

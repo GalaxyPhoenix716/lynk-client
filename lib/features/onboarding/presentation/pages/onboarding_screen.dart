@@ -19,17 +19,20 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     _OnboardingPageData(
       icon: Icons.bolt,
       title: 'Instant Transfers',
-      description: 'Transfer files cross-device without creating an account or logging in.',
+      description:
+          'Transfer files cross-device without creating an account or logging in.',
     ),
     _OnboardingPageData(
       icon: Icons.cloud_upload_outlined,
       title: 'Direct-to-Cloud',
-      description: 'Files stream directly to secure R2 storage. No server proxying.',
+      description:
+          'Files stream directly to secure R2 storage. No server proxying.',
     ),
     _OnboardingPageData(
       icon: Icons.qr_code_scanner,
       title: 'QR Connection',
-      description: 'Simply scan a QR code to connect and initiate transfers seamlessly.',
+      description:
+          'Simply scan a QR code to connect and initiate transfers seamlessly.',
     ),
   ];
 
@@ -48,7 +51,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               child: _currentIndex < _pages.length - 1
                   ? TextButton(
                       onPressed: _finish,
-                      child: const Text('Skip', style: TextStyle(color: AppTheme.textSecondary)),
+                      child: const Text(
+                        'Skip',
+                        style: TextStyle(color: AppTheme.textSecondary),
+                      ),
                     )
                   : const SizedBox(height: 48),
             ),
@@ -66,9 +72,17 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       children: [
                         Icon(page.icon, size: 100, color: AppTheme.primary),
                         const SizedBox(height: 32),
-                        Text(page.title, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
+                        Text(
+                          page.title,
+                          style: Theme.of(context).textTheme.headlineMedium,
+                          textAlign: TextAlign.center,
+                        ),
                         const SizedBox(height: 16),
-                        Text(page.description, style: Theme.of(context).textTheme.bodyMedium, textAlign: TextAlign.center),
+                        Text(
+                          page.description,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          textAlign: TextAlign.center,
+                        ),
                       ],
                     ),
                   );
@@ -87,16 +101,24 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             ),
             const SizedBox(height: 32),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ),
               child: ElevatedButton(
                 onPressed: () {
                   if (_currentIndex == _pages.length - 1) {
                     _finish();
                   } else {
-                    _controller.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+                    _controller.nextPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
                   }
                 },
-                child: Text(_currentIndex == _pages.length - 1 ? 'Get Started' : 'Next'),
+                child: Text(
+                  _currentIndex == _pages.length - 1 ? 'Get Started' : 'Next',
+                ),
               ),
             ),
           ],
@@ -110,5 +132,9 @@ class _OnboardingPageData {
   final IconData icon;
   final String title;
   final String description;
-  const _OnboardingPageData({required this.icon, required this.title, required this.description});
+  const _OnboardingPageData({
+    required this.icon,
+    required this.title,
+    required this.description,
+  });
 }

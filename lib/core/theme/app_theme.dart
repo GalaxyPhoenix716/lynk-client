@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Brand colors
-  static const Color darkBg = Color(0xFF0F172A);      // Slate 900
-  static const Color cardBg = Color(0xFF1E293B);      // Slate 800
-  static const Color primary = Color(0xFF6366F1);     // Indigo 500
-  static const Color secondary = Color(0xFF10B981);   // Emerald 500
-  static const Color error = Color(0xFFEF4444);       // Red 500
+  static const Color darkBg = Color(0xFF0F172A); // Slate 900
+  static const Color cardBg = Color(0xFF1E293B); // Slate 800
+  static const Color primary = Color(0xFF6366F1); // Indigo 500
+  static const Color secondary = Color(0xFF10B981); // Emerald 500
+  static const Color error = Color(0xFFEF4444); // Red 500
   static const Color textPrimary = Color(0xFFF8FAFC); // Slate 50
   static const Color textSecondary = Color(0xFF94A3B8); // Slate 400
 
@@ -36,9 +36,7 @@ class AppTheme {
       cardTheme: CardThemeData(
         color: cardBg,
         elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -81,14 +79,8 @@ class AppTheme {
           fontSize: 20,
           fontWeight: FontWeight.bold,
         ),
-        bodyLarge: TextStyle(
-          color: textPrimary,
-          fontSize: 16,
-        ),
-        bodyMedium: TextStyle(
-          color: textSecondary,
-          fontSize: 14,
-        ),
+        bodyLarge: TextStyle(color: textPrimary, fontSize: 16),
+        bodyMedium: TextStyle(color: textSecondary, fontSize: 14),
       ),
     );
   }

@@ -42,5 +42,13 @@ class FileItem extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, name, size, contentType, status, uploadUrl, downloadUrl];
+  List<Object?> get props => [
+    id,
+    name,
+    size,
+    contentType,
+    status,
+    uploadUrl,
+    downloadUrl,
+  ];
 }

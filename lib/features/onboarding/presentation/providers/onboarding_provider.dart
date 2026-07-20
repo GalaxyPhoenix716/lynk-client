@@ -6,7 +6,9 @@ part 'onboarding_provider.g.dart';
 
 @riverpod
 SharedPreferences sharedPreferences(Ref ref) {
-  throw UnimplementedError('Override sharedPreferencesProvider in main() via ProviderScope');
+  throw UnimplementedError(
+    'Override sharedPreferencesProvider in main() via ProviderScope',
+  );
 }
 
 @riverpod
@@ -18,7 +20,7 @@ class OnboardingNotifier extends _$OnboardingNotifier {
     final prefs = ref.watch(sharedPreferencesProvider);
     return prefs.getBool(_key) ?? false;
   }
-  
+
   Future<void> completeOnboarding() async {
     final prefs = ref.read(sharedPreferencesProvider);
     await prefs.setBool(_key, true);

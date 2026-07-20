@@ -36,7 +36,8 @@ class TransferModel extends Transfer {
       status: parseStatus(json['status'] as String?),
       totalFiles: json['total_files'] as int? ?? parsedFiles.length,
       totalSize: json['total_size'] as int? ?? 0,
-      expiresMultiplier: json['expires_in'] as int? ?? json['expires_at_seconds'] as int?,
+      expiresMultiplier:
+          json['expires_in'] as int? ?? json['expires_at_seconds'] as int?,
       files: parsedFiles,
     );
   }
