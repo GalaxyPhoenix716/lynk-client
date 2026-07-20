@@ -1,11 +1,15 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'api_client.dart';
 
-final apiClientProvider = Provider<ApiClient>((ref) {
-  return ApiClient();
-});
+part 'network_providers.g.dart';
 
-final dioProvider = Provider<Dio>((ref) {
+@riverpod
+ApiClient apiClient(Ref ref) {
+  return ApiClient();
+}
+
+@riverpod
+Dio dio(Ref ref) {
   return ref.watch(apiClientProvider).dio;
-});
+}
