@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/app_theme.dart';
 
-void main() {
-  runApp(
-    const ProviderScope(
-      child: LynkApp(),
-    ),
-  );
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await dotenv.load();
+
+  runApp(const ProviderScope(child: LynkApp()));
 }
 
 class LynkApp extends StatelessWidget {
@@ -29,18 +30,12 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('LYNK'),
-      ),
+      appBar: AppBar(title: const Text('LYNK')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.bolt,
-              size: 80,
-              color: AppTheme.primary,
-            ),
+            const Icon(Icons.bolt, size: 80, color: AppTheme.primary),
             const SizedBox(height: 16),
             Text(
               'Lynk File Transfer',
