@@ -1,23 +1,31 @@
-import '../../../../core/errors/result.dart';
-import '../../domain/entities/receiver_session.dart';
-import '../../domain/repositories/receiver_repository.dart';
-import '../datasources/receiver_remote_data_source.dart';
+import 'package:client/core/errors/failures.dart';
+import 'package:client/core/errors/result.dart';
+import 'package:client/features/file_receive/data/datasources/receiver_remote_data_source.dart';
+import 'package:client/features/file_receive/domain/entities/receiver_session.dart';
+import 'package:client/features/file_receive/domain/repositories/receiver_repository.dart';
 
 class ReceiverRepositoryImpl implements ReceiverRepository {
   final ReceiverRemoteDataSource remoteDataSource;
-
   ReceiverRepositoryImpl({required this.remoteDataSource});
 
   @override
   Future<Result<ReceiverSession>> createReceiverSession() async {
-    // TODO: implement createReceiverSession
-    throw UnimplementedError();
+    try {
+      final session = await remoteDataSource.createReceiverSession();
+      return Result.success(session);
+    } catch (e) {
+      return Result.failure(ServerFailure(e.toString()));
+    }
   }
 
   @override
   Future<Result<ReceiverSession>> getReceiverSession(String sessionId) async {
-    // TODO: implement getReceiverSession
-    throw UnimplementedError();
+    try {
+      final session = await remoteDataSource.getReceiverSession(sessionId);
+      return Result.success(session);
+    } catch (e) {
+      return Result.failure(ServerFailure(e.toString()));
+    }
   }
 
   @override
@@ -25,13 +33,24 @@ class ReceiverRepositoryImpl implements ReceiverRepository {
     required String sessionId,
     required String transferId,
   }) async {
-    // TODO: implement attachTransfer
-    throw UnimplementedError();
+    try {
+      await remoteDataSource.attachTransfer(
+        sessionId: sessionId,
+        transferId: transferId,
+      );
+      return Result.success(null);
+    } catch (e) {
+      return Result.failure(ServerFailure(e.toString()));
+    }
   }
 
   @override
   Future<Result<void>> cancelReceiverSession(String sessionId) async {
-    // TODO: implement cancelReceiverSession
-    throw UnimplementedError();
+    try {
+      await remoteDataSource.cancelReceiverSession(sessionId);
+      return Result.success(null);
+    } catch (e) {
+      return Result.failure(ServerFailure(e.toString()));
+    }
   }
 }
