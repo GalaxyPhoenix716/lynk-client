@@ -19,7 +19,7 @@ class OnboardingNotifier extends _$OnboardingNotifier {
     return prefs.getBool(_key) ?? false;
   }
   
-  Future<void> completedOnboarding() async {
+  Future<void> completeOnboarding() async {
     final prefs = ref.read(sharedPreferencesProvider);
     await prefs.setBool(_key, true);
     state = true;
