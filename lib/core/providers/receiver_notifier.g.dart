@@ -6,10 +6,11 @@ part of 'receiver_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$receiverNotifierHash() => r'd2e3f4a5b67890123456789abcdef0123456789a';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
 @ProviderFor(ReceiverNotifier)
-final receiverNotifierProvider = ReceiverNotifierProvider._();
+final receiverProvider = ReceiverNotifierProvider._();
 
 final class ReceiverNotifierProvider
     extends $NotifierProvider<ReceiverNotifier, ReceiverState> {
@@ -18,7 +19,7 @@ final class ReceiverNotifierProvider
         from: null,
         argument: null,
         retry: null,
-        name: r'receiverNotifierProvider',
+        name: r'receiverProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
@@ -40,6 +41,8 @@ final class ReceiverNotifierProvider
   }
 }
 
+String _$receiverNotifierHash() => r'709896145cbd69a97e7f1701a1dee6a150e4d9b4';
+
 abstract class _$ReceiverNotifier extends $Notifier<ReceiverState> {
   ReceiverState build();
   @$mustCallSuper
@@ -57,5 +60,3 @@ abstract class _$ReceiverNotifier extends $Notifier<ReceiverState> {
     return element.handleCreate(ref, build);
   }
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

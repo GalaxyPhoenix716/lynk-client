@@ -6,13 +6,15 @@ part of 'download_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$downloadServiceHash() => r'ec08572f17c9833ac7097aab021d029fc65615ef';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
 @ProviderFor(downloadService)
 final downloadServiceProvider = DownloadServiceProvider._();
 
 final class DownloadServiceProvider
-    extends $FunctionalProvider<DownloadService, DownloadService, DownloadService>
+    extends
+        $FunctionalProvider<DownloadService, DownloadService, DownloadService>
     with $Provider<DownloadService> {
   DownloadServiceProvider._()
     : super(
@@ -47,10 +49,10 @@ final class DownloadServiceProvider
   }
 }
 
-String _$downloadNotifierHash() => r'c1d2e3f4a5b67890123456789abcdef012345678';
+String _$downloadServiceHash() => r'a1930802bcd8cd2cdfc4b544a9275d75ee647997';
 
 @ProviderFor(DownloadNotifier)
-final downloadNotifierProvider = DownloadNotifierProvider._();
+final downloadProvider = DownloadNotifierProvider._();
 
 final class DownloadNotifierProvider
     extends $NotifierProvider<DownloadNotifier, DownloadState> {
@@ -59,7 +61,7 @@ final class DownloadNotifierProvider
         from: null,
         argument: null,
         retry: null,
-        name: r'downloadNotifierProvider',
+        name: r'downloadProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
@@ -81,6 +83,8 @@ final class DownloadNotifierProvider
   }
 }
 
+String _$downloadNotifierHash() => r'f4839a89bd50267fcf38b6cb35ffe864c07c2cc6';
+
 abstract class _$DownloadNotifier extends $Notifier<DownloadState> {
   DownloadState build();
   @$mustCallSuper
@@ -98,5 +102,3 @@ abstract class _$DownloadNotifier extends $Notifier<DownloadState> {
     return element.handleCreate(ref, build);
   }
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

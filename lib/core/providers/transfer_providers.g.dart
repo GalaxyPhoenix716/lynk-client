@@ -55,7 +55,7 @@ final class TransferRemoteDataSourceProvider
 }
 
 String _$transferRemoteDataSourceHash() =>
-    r'4dfed650023097fd680369e97f82bdff163b1f40';
+    r'ce9056874a7ca5003116a25ba39dbbc35954af1e';
 
 @ProviderFor(transferRepository)
 final transferRepositoryProvider = TransferRepositoryProvider._();

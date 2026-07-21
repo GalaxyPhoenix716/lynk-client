@@ -25,6 +25,7 @@ dependencies:
   permission_handler: ^12.0.3
   smooth_page_indicator: ^2.0.1
   riverpod_annotation: ^4.0.3
+  go_router: ^14.8.1
 
 dev_dependencies:
   riverpod_generator: ^4.0.4

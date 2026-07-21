@@ -6,6 +6,7 @@ part of 'receiver_providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+// GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(receiverRemoteDataSource)
@@ -54,7 +55,7 @@ final class ReceiverRemoteDataSourceProvider
 }
 
 String _$receiverRemoteDataSourceHash() =>
-    r'a1b2c3d4e5f67890123456789abcdef012345678';
+    r'fcce86b3200f736a204c74ad61349932454e0b2b';
 
 @ProviderFor(receiverRepository)
 final receiverRepositoryProvider = ReceiverRepositoryProvider._();
@@ -102,4 +103,4 @@ final class ReceiverRepositoryProvider
 }
 
 String _$receiverRepositoryHash() =>
-    r'b2c3d4e5f67890123456789abcdef0123456789';
+    r'c9faabf64e0c349feef1fb94599fe648551ab40b';
