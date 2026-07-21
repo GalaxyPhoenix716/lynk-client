@@ -1,12 +1,12 @@
 import 'dart:io';
+import 'package:client/core/providers/transfer_providers.dart';
+import 'package:client/core/services/file_picker_service.dart';
+import 'package:client/core/services/upload_service.dart';
+import 'package:client/features/file_receive/presentation/providers/receiver_providers.dart';
+import 'package:client/features/file_transfer/domain/entities/file_item.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../../core/services/file_picker_service.dart';
-import '../../../../core/services/upload_service.dart';
-import '../../../file_receive/presentation/providers/receiver_providers.dart';
-import '../../domain/entities/file_item.dart';
-import '../../../../core/providers/transfer_providers.dart';
 import 'upload_state.dart';
 
 part 'upload_notifier.g.dart';
