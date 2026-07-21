@@ -44,7 +44,6 @@ class UploadNotifier extends _$UploadNotifier {
 
     for (var f in files) {
       if (f.size > 52428800) {
-        // 50 MB
         state = state.copyWith(
             phase: UploadPhase.failed,
             errorMessage: 'File "${f.name}" exceeds 50 MB limit');
