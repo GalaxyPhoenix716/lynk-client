@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:client/core/providers/transfer_providers.dart';
 import 'package:client/core/services/file_picker_service.dart';
 import 'package:client/core/services/upload_service.dart';
-import 'package:client/features/file_receive/presentation/providers/receiver_providers.dart';
+import 'package:client/core/providers/receiver_providers.dart';
 import 'package:client/features/file_transfer/domain/entities/file_item.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';

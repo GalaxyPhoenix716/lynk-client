@@ -1,6 +1,6 @@
-import 'package:client/features/file_transfer/domain/entities/file_item.dart';
-import 'package:client/features/file_transfer/domain/entities/transfer.dart';
 import 'package:equatable/equatable.dart';
+import '../../features/file_transfer/domain/entities/file_item.dart';
+import '../../features/file_transfer/domain/entities/transfer.dart';
 
 enum DownloadPhase { idle, preview, downloading, completed, failed, cancelled }
 
@@ -13,6 +13,7 @@ class DownloadState extends Equatable {
   final DownloadPhase phase;
   final List<String> downloadedPaths;
   final String? errorMessage;
+
   const DownloadState({
     this.transfer,
     this.downloadFiles = const [],
@@ -23,6 +24,7 @@ class DownloadState extends Equatable {
     this.downloadedPaths = const [],
     this.errorMessage,
   });
+
   DownloadState copyWith({
     Transfer? transfer,
     List<FileItem>? downloadFiles,
@@ -47,13 +49,13 @@ class DownloadState extends Equatable {
 
   @override
   List<Object?> get props => [
-    transfer,
-    downloadFiles,
-    currentFileIndex,
-    currentFileProgress,
-    overallProgress,
-    phase,
-    downloadedPaths,
-    errorMessage,
-  ];
+        transfer,
+        downloadFiles,
+        currentFileIndex,
+        currentFileProgress,
+        overallProgress,
+        phase,
+        downloadedPaths,
+        errorMessage,
+      ];
 }

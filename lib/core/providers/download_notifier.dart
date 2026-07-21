@@ -1,10 +1,10 @@
-import 'package:client/core/providers/transfer_providers.dart';
 import 'package:dio/dio.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../../../../core/services/download_service.dart';
+import '../services/download_service.dart';
 import 'download_state.dart';
+import 'transfer_providers.dart';
 
 part 'download_notifier.g.dart';
 
@@ -39,7 +39,7 @@ class DownloadNotifier extends _$DownloadNotifier {
     final downloadService = ref.read(downloadServiceProvider);
 
     final urlResult = await repo.getDownloadUrls(transferId: state.transfer!.id);
-    
+
     urlResult.fold(
       (downloadFiles) async {
         state = state.copyWith(downloadFiles: downloadFiles);
@@ -86,7 +86,7 @@ class DownloadNotifier extends _$DownloadNotifier {
           downloadedPaths: downloadedPaths,
         );
       },
-      (failure) {
+      (failure) async {
         state = state.copyWith(phase: DownloadPhase.failed, errorMessage: failure.message);
       },
     );
