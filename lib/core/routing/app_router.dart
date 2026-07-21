@@ -1,6 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../features/file_receive/presentation/pages/receive_qr_screen.dart';
+import '../../features/file_transfer/domain/entities/transfer.dart';
+import '../../features/file_transfer/presentation/pages/download_progress_screen.dart';
+import '../../features/file_transfer/presentation/pages/file_upload_screen.dart';
+import '../../features/file_transfer/presentation/pages/qr_scan_screen.dart';
+import '../../features/file_transfer/presentation/pages/send_qr_screen.dart';
+import '../../features/home/presentation/pages/home_screen.dart';
+import '../../features/onboarding/presentation/pages/onboarding_screen.dart';
 import '../../features/onboarding/presentation/providers/onboarding_provider.dart';
 
 part 'app_router.g.dart';
@@ -25,51 +32,41 @@ GoRouter appRouter(Ref ref) {
     routes: [
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => const PlaceholderScreen(title: 'Onboarding Screen'),
+        builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
         path: '/home',
-        builder: (context, state) => const PlaceholderScreen(title: 'Home Screen'),
+        builder: (context, state) => const HomeScreen(),
       ),
       GoRoute(
         path: '/upload',
         builder: (context, state) {
           final attachToSessionId = state.uri.queryParameters['attachToSessionId'];
-          return PlaceholderScreen(title: 'Upload Screen (session: $attachToSessionId)');
+          return FileUploadScreen(attachToSessionId: attachToSessionId);
         },
       ),
       GoRoute(
         path: '/send-qr',
-        builder: (context, state) => const PlaceholderScreen(title: 'Send QR Screen'),
+        builder: (context, state) {
+          final transfer = state.extra as Transfer;
+          return SendQrScreen(transfer: transfer);
+        },
       ),
       GoRoute(
         path: '/scan-qr',
-        builder: (context, state) => const PlaceholderScreen(title: 'Scan QR Screen'),
+        builder: (context, state) => const QrScanScreen(),
       ),
       GoRoute(
         path: '/receive-qr',
-        builder: (context, state) => const PlaceholderScreen(title: 'Receive QR Screen'),
+        builder: (context, state) => const ReceiveQrScreen(),
       ),
       GoRoute(
         path: '/download-progress/:transferId',
         builder: (context, state) {
           final transferId = state.pathParameters['transferId'] ?? '';
-          return PlaceholderScreen(title: 'Download Progress Screen (id: $transferId)');
+          return DownloadProgressScreen(transferId: transferId);
         },
       ),
     ],
   );
-}
-
-class PlaceholderScreen extends StatelessWidget {
-  final String title;
-  const PlaceholderScreen({super.key, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(child: Text(title)),
-    );
-  }
 }
