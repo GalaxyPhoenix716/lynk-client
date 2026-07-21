@@ -6,7 +6,7 @@ import '../../../../core/services/file_picker_service.dart';
 import '../../../../core/services/upload_service.dart';
 import '../../../file_receive/presentation/providers/receiver_providers.dart';
 import '../../domain/entities/file_item.dart';
-import 'transfer_providers.dart';
+import '../../../../core/providers/transfer_providers.dart';
 import 'upload_state.dart';
 
 part 'upload_notifier.g.dart';

@@ -1,4 +1,4 @@
-import 'package:client/features/file_transfer/presentation/providers/transfer_providers.dart';
+import 'package:client/core/providers/transfer_providers.dart';
 import 'package:dio/dio.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
