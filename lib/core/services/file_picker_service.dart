@@ -10,7 +10,7 @@ abstract class FilePickerService {
 class FilePickerServiceImpl implements FilePickerService {
   @override
   Future<FilePickerResult?> pickFiles({bool allowMultiple = true}) async {
-    return FilePicker.pickFiles(allowMultiple: allowMultiple);
+    return FilePicker.platform.pickFiles(allowMultiple: allowMultiple);
   }
 }
 
