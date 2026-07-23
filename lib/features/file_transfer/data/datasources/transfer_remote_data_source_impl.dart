@@ -11,7 +11,7 @@ class TransferRemoteDataSourceImpl implements TransferRemoteDataSource {
   @override
   Future<TransferModel> createTransfer(List<FileItemModel> files) async {
     final response = await dio.post(
-      '/transfers',
+      'transfers',
       data: {'files': files.map((f) => f.toJson()).toList()},
     );
     return TransferModel.fromJson(response.data as Map<String, dynamic>);
@@ -22,12 +22,12 @@ class TransferRemoteDataSourceImpl implements TransferRemoteDataSource {
     required String transferId,
     required String fileId,
   }) async {
-    await dio.post('/transfers/$transferId/files/$fileId/complete');
+    await dio.post('transfers/$transferId/files/$fileId/complete');
   }
 
   @override
   Future<TransferModel> getTransferMetadata(String transferId) async {
-    final response = await dio.get('/transfers/$transferId');
+    final response = await dio.get('transfers/$transferId');
     return TransferModel.fromJson(response.data as Map<String, dynamic>);
   }
 
@@ -37,7 +37,7 @@ class TransferRemoteDataSourceImpl implements TransferRemoteDataSource {
     List<String>? fileIds,
   }) async {
     final response = await dio.post(
-      '/transfers/$transferId/downloads',
+      'transfers/$transferId/downloads',
       data: fileIds != null && fileIds.isNotEmpty ? {'file_ids': fileIds} : {},
     );
     final list = response.data['files'] as List<dynamic>;
@@ -48,6 +48,6 @@ class TransferRemoteDataSourceImpl implements TransferRemoteDataSource {
 
   @override
   Future<void> cancelTransfer(String transferId) async {
-    await dio.delete('/transfers/$transferId');
+    await dio.delete('transfers/$transferId');
   }
 }

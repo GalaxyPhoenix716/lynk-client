@@ -8,13 +8,13 @@ class ReceiverRemoteDataSourceImpl implements ReceiverRemoteDataSource {
 
   @override
   Future<ReceiverSessionModel> createReceiverSession() async {
-    final response = await dio.post('/receiver-sessions');
+    final response = await dio.post('receiver-sessions');
     return ReceiverSessionModel.fromJson(response.data as Map<String, dynamic>);
   }
 
   @override
   Future<ReceiverSessionModel> getReceiverSession(String sessionId) async {
-    final response = await dio.get('/receiver-sessions/$sessionId');
+    final response = await dio.get('receiver-sessions/$sessionId');
     return ReceiverSessionModel.fromJson(response.data as Map<String, dynamic>);
   }
 
@@ -24,13 +24,13 @@ class ReceiverRemoteDataSourceImpl implements ReceiverRemoteDataSource {
     required String transferId,
   }) async {
     await dio.post(
-      '/receiver-sessions/$sessionId/attach-transfer',
+      'receiver-sessions/$sessionId/attach-transfer',
       data: {'transfer_id': transferId},
     );
   }
 
   @override
   Future<void> cancelReceiverSession(String sessionId) async {
-    await dio.delete('/receiver-sessions/$sessionId');
+    await dio.delete('receiver-sessions/$sessionId');
   }
 }

@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
-import 'dart:io';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiClient {
@@ -11,6 +9,19 @@ class ApiClient {
     _dio.options.baseUrl = _getBaseUrl();
     _dio.options.connectTimeout = const Duration(seconds: 15);
     _dio.options.receiveTimeout = const Duration(seconds: 15);
+    
+    // Interceptor to strip leading slash so Dio doesn't wipe out /api/v1/ in baseUrl
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          if (options.path.startsWith('/')) {
+            options.path = options.path.substring(1);
+          }
+          return handler.next(options);
+        },
+      ),
+    );
+
     _dio.interceptors.add(
       LogInterceptor(
         requestBody: true,
@@ -21,14 +32,11 @@ class ApiClient {
   }
 
   static String _getBaseUrl() {
-    try {
-      if (Platform.isAndroid) {
-        return dotenv.env['API_BASE_URL']!;
-      }
-    } catch (_) {
-      // Fallback if Platform is not supported (e.g. web)
+    String url = dotenv.env['API_BASE_URL'] ?? 'http://140.245.220.117:8000/api/v1/';
+    if (!url.endsWith('/')) {
+      url = '$url/';
     }
-    return dotenv.env['API_BASE_URL']!;
+    return url;
   }
 
   Dio get dio => _dio;

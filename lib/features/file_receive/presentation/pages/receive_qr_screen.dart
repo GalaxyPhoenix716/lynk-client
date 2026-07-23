@@ -21,9 +21,15 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
   void initState() {
     super.initState();
     Future.microtask(() => ref.read(receiverProvider.notifier).createSession());
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _secondsRemaining = 600;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_secondsRemaining > 0) {
-        setState(() => _secondsRemaining--);
+        if (mounted) setState(() => _secondsRemaining--);
       } else {
         _timer?.cancel();
       }
@@ -63,26 +69,69 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
               if (state.session != null) ...[
                 Container(
                   padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-                  child: QrImageView(data: '{"session_id":"${state.session!.id}"}', size: 220),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: QrImageView(
+                    data: '{"session_id":"${state.session!.id}"}',
+                    version: QrVersions.auto,
+                    size: 220.0,
+                    backgroundColor: Colors.white,
+                  ),
                 ),
                 const SizedBox(height: 24),
-                const Text('Scan with Sender Device', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Scan with Sender Device',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
-                Text('Session expires in $_formattedTime', style: const TextStyle(color: AppTheme.secondary, fontWeight: FontWeight.bold)),
+                Text(
+                  'Session expires in $_formattedTime',
+                  style: const TextStyle(
+                    color: AppTheme.secondary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 const SizedBox(height: 16),
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                    SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
                     SizedBox(width: 8),
-                    Text('Waiting for sender to connect...', style: TextStyle(color: AppTheme.textSecondary)),
+                    Text(
+                      'Waiting for sender to connect...',
+                      style: TextStyle(color: AppTheme.textSecondary),
+                    ),
                   ],
                 ),
-              ] else if (state.isPolling) ...[
+              ] else if (state.errorMessage != null) ...[
+                const Icon(Icons.error_outline, size: 60, color: AppTheme.error),
+                const SizedBox(height: 16),
+                Text(
+                  state.errorMessage!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.read(receiverProvider.notifier).createSession();
+                    _startTimer();
+                  },
+                  child: const Text('Retry Session'),
+                ),
+              ] else ...[
                 const CircularProgressIndicator(),
                 const SizedBox(height: 16),
-                const Text('Generating receive session...'),
+                const Text(
+                  'Generating receive session...',
+                  style: TextStyle(color: AppTheme.textSecondary),
+                ),
               ],
               const Spacer(),
               OutlinedButton(
@@ -90,7 +139,10 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
                   ref.read(receiverProvider.notifier).cancelSession();
                   context.pop();
                 },
-                style: OutlinedButton.styleFrom(foregroundColor: AppTheme.error, side: const BorderSide(color: AppTheme.error)),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.error,
+                  side: const BorderSide(color: AppTheme.error),
+                ),
                 child: const Text('Cancel Session'),
               ),
             ],

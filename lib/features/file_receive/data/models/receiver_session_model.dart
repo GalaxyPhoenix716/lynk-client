@@ -22,7 +22,7 @@ class ReceiverSessionModel extends ReceiverSession {
     }
 
     return ReceiverSessionModel(
-      id: json['session_id'] as String? ?? '',
+      id: (json['session_id'] ?? json['id']) as String? ?? '',
       status: parseStatus(json['status'] as String?),
       transferId: json['transfer_id'] as String?,
       expiresMultiplier:
