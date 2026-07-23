@@ -39,6 +39,11 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    // Safely cancel session and stop polling when the user leaves via back button or pop gesture
+    final currentState = ref.read(receiverProvider);
+    if (currentState.attachedTransferId == null) {
+      ref.read(receiverProvider.notifier).cancelSession();
+    }
     super.dispose();
   }
 
