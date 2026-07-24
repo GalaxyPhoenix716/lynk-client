@@ -62,20 +62,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
       // Non-JSON payload
     }
 
-    // Invalid Lynk QR Code Handler
-    _scanned = true;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Invalid Lynk QR Code. Please scan a valid Lynk code.'),
-        duration: Duration(seconds: 2),
-        backgroundColor: AppTheme.error,
-      ),
-    );
-
-    // Reset scanner lock after 2 seconds to allow rescanning
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) setState(() => _scanned = false);
-    });
+    // If it's a random non-Lynk QR, do absolutely nothing (ignore silently and keep scanner active)
   }
 
   @override
