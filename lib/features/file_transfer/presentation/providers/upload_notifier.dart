@@ -172,7 +172,7 @@ class UploadNotifier extends _$UploadNotifier {
             if (_cancelToken?.isCancelled ?? false) return;
             state = state.copyWith(
               phase: UploadPhase.failed,
-              errorMessage: 'Failed uploading ${pFile.name}',
+              errorMessage: 'Failed uploading ${pFile.name}: $e',
             );
             return;
           }

@@ -22,6 +22,13 @@ class FileUploadScreen extends ConsumerWidget {
       if (next.phase == UploadPhase.completed && next.transfer != null) {
         final key = next.aesKey ?? '';
         context.go('/send-qr?aesKey=$key', extra: next.transfer!);
+      } else if (next.phase == UploadPhase.failed && next.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            backgroundColor: AppTheme.error,
+          ),
+        );
       }
     });
 
@@ -162,6 +169,32 @@ class FileUploadScreen extends ConsumerWidget {
                         child: const Text('Cancel Transfer'),
                       ),
                     ],
+                  ),
+                ),
+              ] else if (uploadState.phase == UploadPhase.failed) ...[
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 70,
+                          color: AppTheme.error,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          uploadState.errorMessage ?? 'Upload failed',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 24),
+                        ElevatedButton(
+                          onPressed: () => notifier.pickFiles(),
+                          child: const Text('Try Again'),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
