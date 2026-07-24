@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/file_size_formatter.dart';
+import '../../../../core/widgets/ad_banner_widget.dart';
 import '../../domain/entities/transfer.dart';
 
 class SendQrScreen extends StatefulWidget {
@@ -92,6 +93,8 @@ class _SendQrScreenState extends State<SendQrScreen> {
                 onPressed: () => context.go('/home'),
                 child: const Text('Done'),
               ),
+              const SizedBox(height: 16),
+              const AdBannerWidget(),
             ],
           ),
         ),

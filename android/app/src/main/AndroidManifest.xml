@@ -27,6 +27,11 @@
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
+        <!-- Google Mobile Ads App ID -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-9472143004063972~5082510676"/>
+
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

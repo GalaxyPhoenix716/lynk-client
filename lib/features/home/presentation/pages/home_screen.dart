@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/services/config_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/ad_banner_widget.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -29,11 +29,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.cardBg,
-        title: const Text('Developer Bypass'),
+        title: const Text('System Diagnostic Key'),
         content: TextField(
           controller: controller,
           obscureText: true,
-          decoration: const InputDecoration(hintText: 'Enter passcode'),
+          decoration: const InputDecoration(hintText: 'Enter config payload'),
         ),
         actions: [
           TextButton(
@@ -42,18 +42,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              final secret = dotenv.env['AD_BYPASS_PASSCODE'];
-              if (controller.text == secret) {
-                final prefs = await SharedPreferences.getInstance();
-                await prefs.setBool('show_ads', false);
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Ads disabled on this device!'),
-                    ),
-                  );
-                }
+              final success = await ConfigService.applyConfigurationKey(controller.text);
+              if (success && context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('System configuration updated.'),
+                  ),
+                );
               }
             },
             child: const Text('Submit'),
@@ -117,6 +113,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+              const AdBannerWidget(),
             ],
           ),
         ),

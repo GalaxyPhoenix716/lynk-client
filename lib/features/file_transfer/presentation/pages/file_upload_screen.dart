@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/services/ad_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/file_size_formatter.dart';
+import '../../../../core/widgets/ad_banner_widget.dart';
 import '../providers/upload_notifier.dart';
 import '../providers/upload_state.dart';
 
@@ -117,9 +119,12 @@ class FileUploadScreen extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () => notifier.startUpload(
-                          attachToSessionId: attachToSessionId,
-                        ),
+                        onPressed: () {
+                          notifier.startUpload(
+                            attachToSessionId: attachToSessionId,
+                          );
+                          AdService.showInterstitialAd();
+                        },
                         child: const Text('Initiate Transfer'),
                       ),
                     ),
@@ -160,6 +165,8 @@ class FileUploadScreen extends ConsumerWidget {
                   ),
                 ),
               ],
+              const SizedBox(height: 16),
+              const AdBannerWidget(),
             ],
           ),
         ),

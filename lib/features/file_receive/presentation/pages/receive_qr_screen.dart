@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../../core/providers/receiver_notifier.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/ad_banner_widget.dart';
 
 class ReceiveQrScreen extends ConsumerStatefulWidget {
   const ReceiveQrScreen({super.key});
@@ -157,6 +158,8 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
                 ),
                 child: const Text('Cancel Session'),
               ),
+              const SizedBox(height: 16),
+              const AdBannerWidget(),
             ],
           ),
         ),
