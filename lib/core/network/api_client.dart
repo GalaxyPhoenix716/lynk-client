@@ -9,7 +9,7 @@ class ApiClient {
     _dio.options.baseUrl = _getBaseUrl();
     _dio.options.connectTimeout = const Duration(seconds: 15);
     _dio.options.receiveTimeout = const Duration(seconds: 15);
-    
+
     // Interceptor to strip leading slash so Dio doesn't wipe out /api/v1/ in baseUrl
     _dio.interceptors.add(
       InterceptorsWrapper(
@@ -32,7 +32,8 @@ class ApiClient {
   }
 
   static String _getBaseUrl() {
-    String url = dotenv.env['API_BASE_URL'] ?? 'http://140.245.220.117:8000/api/v1/';
+    String url =
+        dotenv.env['API_BASE_URL'] ?? 'http://140.245.220.117:8000/api/v1/';
     if (!url.endsWith('/')) {
       url = '$url/';
     }
