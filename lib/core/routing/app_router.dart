@@ -53,7 +53,8 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/scan-qr',
         builder: (context, state) {
-          final attachTransferId = state.uri.queryParameters['attachTransferId'];
+          final attachTransferId =
+              state.uri.queryParameters['attachTransferId'];
           return QrScanScreen(attachTransferId: attachTransferId);
         },
       ),

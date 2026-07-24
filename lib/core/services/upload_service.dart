@@ -39,17 +39,19 @@ class UploadService {
         uploadUrl,
         data: uploadData,
         options: Options(
-          contentType: contentType.isNotEmpty ? contentType : 'application/octet-stream',
-          headers: {
-            Headers.contentLengthHeader: size,
-          },
+          contentType: contentType.isNotEmpty
+              ? contentType
+              : 'application/octet-stream',
+          headers: {Headers.contentLengthHeader: size},
         ),
         onSendProgress: onProgress,
         cancelToken: cancelToken,
       );
     } on DioException catch (e) {
       final responseBody = e.response?.data?.toString() ?? e.message;
-      throw Exception('R2 upload failed (${e.response?.statusCode}): $responseBody');
+      throw Exception(
+        'R2 upload failed (${e.response?.statusCode}): $responseBody',
+      );
     }
   }
 }

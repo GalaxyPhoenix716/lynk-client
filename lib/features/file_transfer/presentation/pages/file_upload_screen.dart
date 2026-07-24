@@ -32,7 +32,8 @@ class FileUploadScreen extends ConsumerWidget {
         } else {
           context.go('/send-qr?aesKey=$key', extra: next.transfer!);
         }
-      } else if (next.phase == UploadPhase.failed && next.errorMessage != null) {
+      } else if (next.phase == UploadPhase.failed &&
+          next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(next.errorMessage!),
