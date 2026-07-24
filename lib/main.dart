@@ -9,7 +9,11 @@ import 'features/onboarding/presentation/providers/onboarding_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load();
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (e) {
+    debugPrint('Dotenv initialization warning: $e');
+  }
   await AdService.init();
   AdService.preloadInterstitialAd();
 
