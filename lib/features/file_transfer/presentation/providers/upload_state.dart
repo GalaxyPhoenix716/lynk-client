@@ -7,6 +7,7 @@ enum UploadPhase { idle, selecting, uploading, completed, failed, cancelled }
 class UploadState extends Equatable {
   final List<PlatformFile> selectedFiles;
   final Transfer? transfer;
+  final String? aesKey;
   final int currentFileIndex;
   final double currentFileProgress;
   final double overallProgress;
@@ -17,6 +18,7 @@ class UploadState extends Equatable {
   const UploadState({
     this.selectedFiles = const [],
     this.transfer,
+    this.aesKey,
     this.currentFileIndex = 0,
     this.currentFileProgress = 0.0,
     this.overallProgress = 0.0,
@@ -25,11 +27,13 @@ class UploadState extends Equatable {
     this.errorMessage,
   });
 
-  int get totalSize => selectedFiles.fold(0, (sum, f) => sum + f.size);
+  int get totalSize =>
+      selectedFiles.fold(0, (sum, f) => sum + ((f.size ~/ 16) + 1) * 16 + 16);
 
   UploadState copyWith({
     List<PlatformFile>? selectedFiles,
     Transfer? transfer,
+    String? aesKey,
     int? currentFileIndex,
     double? currentFileProgress,
     double? overallProgress,
@@ -40,6 +44,7 @@ class UploadState extends Equatable {
     return UploadState(
       selectedFiles: selectedFiles ?? this.selectedFiles,
       transfer: transfer ?? this.transfer,
+      aesKey: aesKey ?? this.aesKey,
       currentFileIndex: currentFileIndex ?? this.currentFileIndex,
       currentFileProgress: currentFileProgress ?? this.currentFileProgress,
       overallProgress: overallProgress ?? this.overallProgress,
@@ -51,13 +56,14 @@ class UploadState extends Equatable {
 
   @override
   List<Object?> get props => [
-        selectedFiles,
-        transfer,
-        currentFileIndex,
-        currentFileProgress,
-        overallProgress,
-        bytesUploaded,
-        phase,
-        errorMessage,
-      ];
+    selectedFiles,
+    transfer,
+    aesKey,
+    currentFileIndex,
+    currentFileProgress,
+    overallProgress,
+    bytesUploaded,
+    phase,
+    errorMessage,
+  ];
 }

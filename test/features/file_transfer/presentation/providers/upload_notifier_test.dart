@@ -20,7 +20,7 @@ void main() {
           PlatformFile(name: 'b.jpg', size: 250),
         ],
       );
-      expect(state.totalSize, 350);
+      expect(state.totalSize, 400);
     });
   });
 
@@ -50,9 +50,7 @@ void main() {
       addTearDown(container.dispose);
 
       final notifier = container.read(uploadProvider.notifier);
-      notifier.setFilesForTesting([
-        PlatformFile(name: 'a.txt', size: 100),
-      ]);
+      notifier.setFilesForTesting([PlatformFile(name: 'a.txt', size: 100)]);
 
       notifier.removeFile(0);
 
