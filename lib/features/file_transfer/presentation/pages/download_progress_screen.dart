@@ -8,7 +8,12 @@ import '../../../../core/utils/file_size_formatter.dart';
 
 class DownloadProgressScreen extends ConsumerStatefulWidget {
   final String transferId;
-  const DownloadProgressScreen({super.key, required this.transferId});
+  final String aesKey;
+  const DownloadProgressScreen({
+    super.key,
+    required this.transferId,
+    this.aesKey = '',
+  });
 
   @override
   ConsumerState<DownloadProgressScreen> createState() =>
@@ -78,7 +83,7 @@ class _DownloadProgressScreenState
                       ),
                       const SizedBox(height: 32),
                       ElevatedButton(
-                        onPressed: () => notifier.startDownload(),
+                        onPressed: () => notifier.startDownload(aesKey: widget.aesKey),
                         child: const Text('Start Download'),
                       ),
                     ],

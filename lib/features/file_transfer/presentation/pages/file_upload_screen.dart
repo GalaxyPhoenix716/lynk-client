@@ -18,7 +18,8 @@ class FileUploadScreen extends ConsumerWidget {
 
     ref.listen<UploadState>(uploadProvider, (previous, next) {
       if (next.phase == UploadPhase.completed && next.transfer != null) {
-        context.go('/send-qr', extra: next.transfer!);
+        final key = next.aesKey ?? '';
+        context.go('/send-qr?aesKey=$key', extra: next.transfer!);
       }
     });
 

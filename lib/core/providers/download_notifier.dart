@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
@@ -5,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../services/download_service.dart';
 import 'download_state.dart';
 import 'transfer_providers.dart';
+import '../../features/file_receive/domain/usecases/decrypt_file_use_case.dart';
 
 part 'download_notifier.g.dart';
 
@@ -35,11 +37,12 @@ class DownloadNotifier extends _$DownloadNotifier {
     );
   }
 
-  Future<void> startDownload() async {
+  Future<void> startDownload({String? aesKey}) async {
     if (state.transfer == null) return;
 
     state = state.copyWith(
       phase: DownloadPhase.downloading,
+      aesKey: aesKey,
       currentFileIndex: 0,
       overallProgress: 0.0,
     );
@@ -47,6 +50,7 @@ class DownloadNotifier extends _$DownloadNotifier {
 
     final repo = ref.read(transferRepositoryProvider);
     final downloadService = ref.read(downloadServiceProvider);
+    final decryptUseCase = ref.read(decryptFileUseCaseProvider);
 
     final urlResult = await repo.getDownloadUrls(
       transferId: state.transfer!.id,
@@ -65,13 +69,14 @@ class DownloadNotifier extends _$DownloadNotifier {
 
           final item = downloadFiles[i];
           final savePath = '${dir.path}/${item.name}';
+          final tempSavePath = '$savePath.enc';
 
           state = state.copyWith(currentFileIndex: i, currentFileProgress: 0.0);
 
           try {
             await downloadService.downloadFileFromR2(
               downloadUrl: item.downloadUrl!,
-              savePath: savePath,
+              savePath: tempSavePath,
               cancelToken: _cancelToken,
               onProgress: (received, total) {
                 final fileProgress = total > 0 ? received / total : 0.0;
@@ -84,6 +89,25 @@ class DownloadNotifier extends _$DownloadNotifier {
                 );
               },
             );
+
+            // Decrypt the downloaded file if a key is available
+            final key = aesKey ?? state.aesKey;
+            if (key != null && key.isNotEmpty) {
+              await decryptUseCase.execute(
+                encryptedFile: File(tempSavePath),
+                aesKey32Bytes: key,
+                outputPath: savePath,
+              );
+              final tempFile = File(tempSavePath);
+              if (await tempFile.exists()) {
+                await tempFile.delete();
+              }
+            } else {
+              final tempFile = File(tempSavePath);
+              if (await tempFile.exists()) {
+                await tempFile.rename(savePath);
+              }
+            }
 
             downloadedPaths.add(savePath);
             cumulativeBytes += item.size;

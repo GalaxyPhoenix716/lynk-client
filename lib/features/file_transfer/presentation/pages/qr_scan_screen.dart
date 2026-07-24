@@ -19,16 +19,17 @@ class _QrScanScreenState extends State<QrScanScreen> {
     final rawValue = capture.barcodes.first.rawValue;
     if (rawValue == null) return;
 
-    // Pattern 1: Clean URL format (https://lynk.app/send/xyz or https://lynk.app/receive/abc)
-    if (rawValue.startsWith('https://lynk.app/')) {
-      final path = rawValue.replaceFirst('https://lynk.app/', '');
-      final segments = path.split('/');
+    // Pattern 1: Clean URL format (https://lynk.app/send/xyz#aesKey or https://lynk.app/receive/abc)
+    final uri = Uri.tryParse(rawValue);
+    if (uri != null && (uri.scheme == 'https' || uri.scheme == 'http') && uri.host == 'lynk.app') {
+      final segments = uri.pathSegments;
       if (segments.length >= 2) {
         final action = segments[0];
         final id = segments[1];
+        final aesKey = uri.fragment;
         if (action == 'send') {
           _scanned = true;
-          context.go('/download-progress/$id');
+          context.go('/download-progress/$id?aesKey=$aesKey');
           return;
         } else if (action == 'receive') {
           _scanned = true;

@@ -7,6 +7,7 @@ enum DownloadPhase { idle, preview, downloading, completed, failed, cancelled }
 class DownloadState extends Equatable {
   final Transfer? transfer;
   final List<FileItem> downloadFiles;
+  final String? aesKey;
   final int currentFileIndex;
   final double currentFileProgress;
   final double overallProgress;
@@ -17,6 +18,7 @@ class DownloadState extends Equatable {
   const DownloadState({
     this.transfer,
     this.downloadFiles = const [],
+    this.aesKey,
     this.currentFileIndex = 0,
     this.currentFileProgress = 0.0,
     this.overallProgress = 0.0,
@@ -28,6 +30,7 @@ class DownloadState extends Equatable {
   DownloadState copyWith({
     Transfer? transfer,
     List<FileItem>? downloadFiles,
+    String? aesKey,
     int? currentFileIndex,
     double? currentFileProgress,
     double? overallProgress,
@@ -38,6 +41,7 @@ class DownloadState extends Equatable {
     return DownloadState(
       transfer: transfer ?? this.transfer,
       downloadFiles: downloadFiles ?? this.downloadFiles,
+      aesKey: aesKey ?? this.aesKey,
       currentFileIndex: currentFileIndex ?? this.currentFileIndex,
       currentFileProgress: currentFileProgress ?? this.currentFileProgress,
       overallProgress: overallProgress ?? this.overallProgress,
@@ -51,6 +55,7 @@ class DownloadState extends Equatable {
   List<Object?> get props => [
     transfer,
     downloadFiles,
+    aesKey,
     currentFileIndex,
     currentFileProgress,
     overallProgress,

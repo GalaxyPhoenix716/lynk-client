@@ -62,7 +62,8 @@ GoRouter appRouter(Ref ref) {
         path: '/download-progress/:transferId',
         builder: (context, state) {
           final transferId = state.pathParameters['transferId'] ?? '';
-          return DownloadProgressScreen(transferId: transferId);
+          final aesKey = state.uri.queryParameters['aesKey'] ?? '';
+          return DownloadProgressScreen(transferId: transferId, aesKey: aesKey);
         },
       ),
     ],
