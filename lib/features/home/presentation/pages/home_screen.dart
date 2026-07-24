@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/services/config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/ad_banner_widget.dart';
+import '../../../../features/file_transfer/presentation/providers/upload_notifier.dart';
+import '../../../../features/file_transfer/presentation/providers/upload_state.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -63,6 +65,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final uploadState = ref.watch(uploadProvider);
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -76,7 +80,62 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   context,
                 ).textTheme.headlineMedium?.copyWith(letterSpacing: 2),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
+              if (uploadState.phase == UploadPhase.completed &&
+                  uploadState.transfer != null) ...[
+                InkWell(
+                  onTap: () {
+                    final key = uploadState.aesKey ?? '';
+                    context.push(
+                      '/send-qr?aesKey=$key',
+                      extra: uploadState.transfer!,
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppTheme.secondary.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppTheme.secondary),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.flash_on, color: AppTheme.secondary),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Active Transfer Available',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.secondary,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                'Tap to view QR code or scan receivers',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 16,
+                          color: AppTheme.secondary,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
               Expanded(
                 child: Column(
                   children: [

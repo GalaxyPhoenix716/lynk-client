@@ -86,7 +86,7 @@ class _QrScanScreenState extends ConsumerState<QrScanScreen> {
                 backgroundColor: AppTheme.secondary,
               ),
             );
-            context.go('/home');
+            context.pop();
           },
           (failure) {
             ScaffoldMessenger.of(context).showSnackBar(
