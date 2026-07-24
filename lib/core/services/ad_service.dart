@@ -9,7 +9,8 @@ class AdService {
 
   /// Default Google Test Ad Unit IDs
   static const String _testBannerId = 'ca-app-pub-3940256099942544/6300978111';
-  static const String _testInterstitialId = 'ca-app-pub-3940256099942544/1033173712';
+  static const String _testInterstitialId =
+      'ca-app-pub-3940256099942544/1033173712';
 
   static String get bannerAdUnitId {
     if (kDebugMode) return _testBannerId;
@@ -31,7 +32,9 @@ class AdService {
   }
 
   static Future<void> preloadInterstitialAd() async {
-    if (!await shouldShowAds() || _isInterstitialLoading || _interstitialAd != null) {
+    if (!await shouldShowAds() ||
+        _isInterstitialLoading ||
+        _interstitialAd != null) {
       return;
     }
 

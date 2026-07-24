@@ -42,7 +42,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           ElevatedButton(
             onPressed: () async {
-              final success = await ConfigService.applyConfigurationKey(controller.text);
+              final success = await ConfigService.applyConfigurationKey(
+                controller.text,
+              );
               if (success && context.mounted) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
