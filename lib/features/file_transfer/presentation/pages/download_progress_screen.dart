@@ -195,6 +195,12 @@ class _DownloadProgressScreenState
                         ),
                         const SizedBox(height: 24),
                         ElevatedButton(
+                          onPressed: () =>
+                              notifier.startDownload(aesKey: widget.aesKey),
+                          child: const Text('Retry Download'),
+                        ),
+                        const SizedBox(height: 12),
+                        TextButton(
                           onPressed: () => context.go('/home'),
                           child: const Text('Back to Home'),
                         ),

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
@@ -59,7 +60,7 @@ class DownloadNotifier extends _$DownloadNotifier {
     urlResult.fold(
       (downloadFiles) async {
         state = state.copyWith(downloadFiles: downloadFiles);
-        final dir = await getApplicationDocumentsDirectory();
+        final dir = kIsWeb ? null : await getApplicationDocumentsDirectory();
         final downloadedPaths = <String>[];
         int cumulativeBytes = 0;
         final totalSize = state.transfer!.totalSize;
@@ -68,54 +69,82 @@ class DownloadNotifier extends _$DownloadNotifier {
           if (_cancelToken?.isCancelled ?? false) return;
 
           final item = downloadFiles[i];
-          final savePath = '${dir.path}/${item.name}';
-          final tempSavePath = '$savePath.enc';
-
           state = state.copyWith(currentFileIndex: i, currentFileProgress: 0.0);
 
           try {
-            await downloadService.downloadFileFromR2(
-              downloadUrl: item.downloadUrl!,
-              savePath: tempSavePath,
-              cancelToken: _cancelToken,
-              onProgress: (received, total) {
-                final fileProgress = total > 0 ? received / total : 0.0;
-                final overall = totalSize > 0
-                    ? (cumulativeBytes + received) / totalSize
-                    : 0.0;
-                state = state.copyWith(
-                  currentFileProgress: fileProgress,
-                  overallProgress: overall.clamp(0.0, 1.0),
-                );
-              },
-            );
-
-            // Decrypt the downloaded file if a key is available
             final key = aesKey ?? state.aesKey;
-            if (key != null && key.isNotEmpty) {
-              await decryptUseCase.execute(
-                encryptedFile: File(tempSavePath),
-                aesKey32Bytes: key,
-                outputPath: savePath,
+
+            if (kIsWeb) {
+              final encBytes = await downloadService.downloadBytesFromR2(
+                downloadUrl: item.downloadUrl!,
+                cancelToken: _cancelToken,
+                onProgress: (received, total) {
+                  final fileProgress = total > 0 ? received / total : 0.0;
+                  final overall = totalSize > 0
+                      ? (cumulativeBytes + received) / totalSize
+                      : 0.0;
+                  state = state.copyWith(
+                    currentFileProgress: fileProgress,
+                    overallProgress: overall.clamp(0.0, 1.0),
+                  );
+                },
               );
-              final tempFile = File(tempSavePath);
-              if (await tempFile.exists()) {
-                await tempFile.delete();
+
+              Uint8List finalBytes = encBytes;
+              if (key != null && key.isNotEmpty) {
+                finalBytes = decryptUseCase.executeBytes(
+                  encryptedBytes: encBytes,
+                  aesKey32Bytes: key,
+                );
               }
+              downloadedPaths.add('${item.name} (${finalBytes.length} bytes)');
             } else {
-              final tempFile = File(tempSavePath);
-              if (await tempFile.exists()) {
-                await tempFile.rename(savePath);
+              final savePath = '${dir!.path}/${item.name}';
+              final tempSavePath = '$savePath.enc';
+
+              await downloadService.downloadFileFromR2(
+                downloadUrl: item.downloadUrl!,
+                savePath: tempSavePath,
+                cancelToken: _cancelToken,
+                onProgress: (received, total) {
+                  final fileProgress = total > 0 ? received / total : 0.0;
+                  final overall = totalSize > 0
+                      ? (cumulativeBytes + received) / totalSize
+                      : 0.0;
+                  state = state.copyWith(
+                    currentFileProgress: fileProgress,
+                    overallProgress: overall.clamp(0.0, 1.0),
+                  );
+                },
+              );
+
+              // Decrypt the downloaded file if a key is available
+              if (key != null && key.isNotEmpty) {
+                await decryptUseCase.execute(
+                  encryptedFile: File(tempSavePath),
+                  aesKey32Bytes: key,
+                  outputPath: savePath,
+                );
+                final tempFile = File(tempSavePath);
+                if (await tempFile.exists()) {
+                  await tempFile.delete();
+                }
+              } else {
+                final tempFile = File(tempSavePath);
+                if (await tempFile.exists()) {
+                  await tempFile.rename(savePath);
+                }
               }
+
+              downloadedPaths.add(savePath);
             }
 
-            downloadedPaths.add(savePath);
             cumulativeBytes += item.size;
           } catch (e) {
             if (_cancelToken?.isCancelled ?? false) return;
             state = state.copyWith(
               phase: DownloadPhase.failed,
-              errorMessage: 'Failed downloading ${item.name}',
+              errorMessage: 'Failed downloading ${item.name}: $e',
             );
             return;
           }
@@ -137,7 +166,9 @@ class DownloadNotifier extends _$DownloadNotifier {
   }
 
   Future<void> openFile(String path) async {
-    await OpenFilex.open(path);
+    if (!kIsWeb) {
+      await OpenFilex.open(path);
+    }
   }
 
   void cancelDownload() {
