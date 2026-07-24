@@ -21,7 +21,17 @@ class FileUploadScreen extends ConsumerWidget {
     ref.listen<UploadState>(uploadProvider, (previous, next) {
       if (next.phase == UploadPhase.completed && next.transfer != null) {
         final key = next.aesKey ?? '';
-        context.go('/send-qr?aesKey=$key', extra: next.transfer!);
+        if (attachToSessionId != null && attachToSessionId!.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Transfer sent to receiver successfully!'),
+              backgroundColor: AppTheme.secondary,
+            ),
+          );
+          context.go('/home');
+        } else {
+          context.go('/send-qr?aesKey=$key', extra: next.transfer!);
+        }
       } else if (next.phase == UploadPhase.failed && next.errorMessage != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

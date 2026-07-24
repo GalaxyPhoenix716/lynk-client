@@ -1,17 +1,20 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import '../../../../core/providers/receiver_providers.dart';
 import '../../../../core/theme/app_theme.dart';
 
-class QrScanScreen extends StatefulWidget {
-  const QrScanScreen({super.key});
+class QrScanScreen extends ConsumerStatefulWidget {
+  final String? attachTransferId;
+  const QrScanScreen({super.key, this.attachTransferId});
 
   @override
-  State<QrScanScreen> createState() => _QrScanScreenState();
+  ConsumerState<QrScanScreen> createState() => _QrScanScreenState();
 }
 
-class _QrScanScreenState extends State<QrScanScreen> {
+class _QrScanScreenState extends ConsumerState<QrScanScreen> {
   bool _scanned = false;
 
   void _onDetect(BarcodeCapture capture) {
@@ -35,7 +38,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
           return;
         } else if (action == 'receive') {
           _scanned = true;
-          context.go('/upload?attachToSessionId=$id');
+          _handleReceiveSession(id);
           return;
         }
       }
@@ -54,7 +57,7 @@ class _QrScanScreenState extends State<QrScanScreen> {
             json['session_id'] is String) {
           _scanned = true;
           final sessionId = json['session_id'] as String;
-          context.go('/upload?attachToSessionId=$sessionId');
+          _handleReceiveSession(sessionId);
           return;
         }
       }
@@ -65,10 +68,52 @@ class _QrScanScreenState extends State<QrScanScreen> {
     // If it's a random non-Lynk QR, do absolutely nothing (ignore silently and keep scanner active)
   }
 
+  Future<void> _handleReceiveSession(String sessionId) async {
+    if (widget.attachTransferId != null &&
+        widget.attachTransferId!.isNotEmpty) {
+      final repo = ref.read(receiverRepositoryProvider);
+      final result = await repo.attachTransfer(
+        sessionId: sessionId,
+        transferId: widget.attachTransferId!,
+      );
+
+      if (mounted) {
+        result.fold(
+          (_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Files successfully sent to receiver!'),
+                backgroundColor: AppTheme.secondary,
+              ),
+            );
+            context.go('/home');
+          },
+          (failure) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to pair: ${failure.message}'),
+                backgroundColor: AppTheme.error,
+              ),
+            );
+            setState(() => _scanned = false);
+          },
+        );
+      }
+    } else {
+      context.go('/upload?attachToSessionId=$sessionId');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Scan QR Code')),
+      appBar: AppBar(
+        title: Text(
+          widget.attachTransferId != null
+              ? 'Scan Receiver QR Code'
+              : 'Scan QR Code',
+        ),
+      ),
       body: Stack(
         children: [
           MobileScanner(onDetect: _onDetect),
@@ -82,14 +127,16 @@ class _QrScanScreenState extends State<QrScanScreen> {
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
             bottom: 40,
             left: 24,
             right: 24,
             child: Text(
-              'Align sender or receiver QR code within frame',
+              widget.attachTransferId != null
+                  ? 'Align receiver QR code within frame to pair'
+                  : 'Align sender or receiver QR code within frame',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
         ],

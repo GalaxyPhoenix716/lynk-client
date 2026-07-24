@@ -89,6 +89,16 @@ class _SendQrScreenState extends State<SendQrScreen> {
                 style: const TextStyle(color: AppTheme.textSecondary),
               ),
               const Spacer(),
+              OutlinedButton.icon(
+                onPressed: () {
+                  context.push(
+                    '/scan-qr?attachTransferId=${widget.transfer.id}',
+                  );
+                },
+                icon: const Icon(Icons.qr_code_scanner),
+                label: const Text("Scan Receiver's Code"),
+              ),
+              const SizedBox(height: 12),
               ElevatedButton(
                 onPressed: () => context.go('/home'),
                 child: const Text('Done'),
