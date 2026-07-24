@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/providers/download_notifier.dart';
 import '../../../../core/providers/download_state.dart';
+import '../../../../core/providers/transfer_providers.dart';
+import '../../../../core/services/ad_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/file_size_formatter.dart';
 import '../../../../core/widgets/ad_banner_widget.dart';
@@ -30,6 +32,36 @@ class _DownloadProgressScreenState
       () => ref
           .read(downloadProvider.notifier)
           .loadTransferPreview(widget.transferId),
+    );
+  }
+
+  void _showAdNoticeAndStartDownload(
+    BuildContext context,
+    DownloadNotifier notifier,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppTheme.cardBg,
+        title: const Text('Preparing Download'),
+        content: const Text(
+          'Watch a quick ad while your files stream and decrypt in the background.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              notifier.startDownload(aesKey: widget.aesKey);
+              AdService.showInterstitialAd();
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -85,7 +117,7 @@ class _DownloadProgressScreenState
                       const SizedBox(height: 32),
                       ElevatedButton(
                         onPressed: () =>
-                            notifier.startDownload(aesKey: widget.aesKey),
+                            _showAdNoticeAndStartDownload(context, notifier),
                         child: const Text('Start Download'),
                       ),
                     ],
@@ -115,7 +147,20 @@ class _DownloadProgressScreenState
                       ),
                       const SizedBox(height: 32),
                       OutlinedButton(
-                        onPressed: () => notifier.cancelDownload(),
+                        onPressed: () {
+                          notifier.cancelDownload();
+                          if (state.transfer != null) {
+                            ref
+                                .read(transferRepositoryProvider)
+                                .cancelTransfer(state.transfer!.id);
+                          }
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Download cancelled.'),
+                            ),
+                          );
+                          context.go('/home');
+                        },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppTheme.error,
                           side: const BorderSide(color: AppTheme.error),
