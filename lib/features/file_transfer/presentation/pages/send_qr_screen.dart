@@ -1,8 +1,13 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../../core/providers/transfer_providers.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/file_size_formatter.dart';
@@ -21,6 +26,7 @@ class SendQrScreen extends ConsumerStatefulWidget {
 class _SendQrScreenState extends ConsumerState<SendQrScreen> {
   int _secondsRemaining = 600; // 10 minutes timer
   Timer? _timer;
+  final GlobalKey _qrKey = GlobalKey();
 
   @override
   void initState() {
@@ -54,6 +60,33 @@ class _SendQrScreenState extends ConsumerState<SendQrScreen> {
     }
   }
 
+  Future<void> _shareQrImage() async {
+    try {
+      final boundary =
+          _qrKey.currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      if (boundary == null) return;
+
+      final image = await boundary.toImage(pixelRatio: 3.0);
+      final byteData = await image.toByteData(format: ImageByteFormat.png);
+      if (byteData == null) return;
+
+      final pngBytes = byteData.buffer.asUint8List();
+      final tempDir = await getTemporaryDirectory();
+      final file = File('${tempDir.path}/lynk_qr.png');
+      await file.writeAsBytes(pngBytes);
+
+      await Share.shareXFiles([
+        XFile(file.path),
+      ], text: 'Scan this QR code with Lynk App to download files.');
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to share QR image: $e')));
+      }
+    }
+  }
+
   String get _formattedTime {
     final m = _secondsRemaining ~/ 60;
     final s = _secondsRemaining % 60;
@@ -66,17 +99,16 @@ class _SendQrScreenState extends ConsumerState<SendQrScreen> {
         'https://lynk.app/send/${widget.transfer.id}#${widget.aesKey}';
 
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        await _cancelSessionAndGoHome();
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        // Safe back navigation: preserve session in background
       },
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Share Transfer'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: _cancelSessionAndGoHome,
+            onPressed: () => context.go('/home'),
           ),
         ),
         body: SafeArea(
@@ -85,17 +117,20 @@ class _SendQrScreenState extends ConsumerState<SendQrScreen> {
             child: Column(
               children: [
                 const Spacer(),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: QrImageView(
-                    data: qrData,
-                    version: QrVersions.auto,
-                    size: 220.0,
-                    backgroundColor: Colors.white,
+                RepaintBoundary(
+                  key: _qrKey,
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: QrImageView(
+                      data: qrData,
+                      version: QrVersions.auto,
+                      size: 220.0,
+                      backgroundColor: Colors.white,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -126,10 +161,19 @@ class _SendQrScreenState extends ConsumerState<SendQrScreen> {
                   icon: const Icon(Icons.qr_code_scanner),
                   label: const Text("Scan Receiver's Code"),
                 ),
+                const SizedBox(height: 10),
+                OutlinedButton.icon(
+                  onPressed: _shareQrImage,
+                  icon: const Icon(Icons.share),
+                  label: const Text('Share QR Image'),
+                ),
                 const SizedBox(height: 12),
                 ElevatedButton(
-                  onPressed: () => context.go('/home'),
-                  child: const Text('Done'),
+                  onPressed: _cancelSessionAndGoHome,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.error,
+                  ),
+                  child: const Text('Cancel Session'),
                 ),
                 const SizedBox(height: 16),
                 const AdBannerWidget(),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/providers/download_notifier.dart';
+import '../../../../core/providers/download_state.dart';
 import '../../../../core/services/config_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/ad_banner_widget.dart';
@@ -66,6 +68,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final uploadState = ref.watch(uploadProvider);
+    final downloadState = ref.watch(downloadProvider);
 
     return Scaffold(
       body: SafeArea(
@@ -162,6 +165,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ],
                 ),
               ),
+              if (downloadState.phase == DownloadPhase.downloading) ...[
+                const SizedBox(height: 12),
+                InkWell(
+                  onTap: () {
+                    if (downloadState.transfer != null) {
+                      final key = downloadState.aesKey ?? '';
+                      context.push(
+                        '/download-progress/${downloadState.transfer!.id}?aesKey=$key',
+                      );
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppTheme.primary),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.downloading,
+                              color: AppTheme.primary,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Downloading: ${(downloadState.overallProgress * 100).toStringAsFixed(0)}%',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: AppTheme.primary,
+                                ),
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 14,
+                              color: AppTheme.primary,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        LinearProgressIndicator(
+                          value: downloadState.overallProgress,
+                          backgroundColor: AppTheme.cardBg,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
               Center(
                 child: GestureDetector(
                   onTap: _onVersionTap,

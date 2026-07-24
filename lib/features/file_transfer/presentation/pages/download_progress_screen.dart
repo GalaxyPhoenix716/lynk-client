@@ -70,193 +70,205 @@ class _DownloadProgressScreenState
     final state = ref.watch(downloadProvider);
     final notifier = ref.read(downloadProvider.notifier);
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Download Transfer')),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            children: [
-              if (state.phase == DownloadPhase.idle) ...[
-                const Expanded(
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 16),
-                        Text('Fetching transfer details...'),
-                      ],
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        // Safe back navigation: preserve active download in background
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Download Transfer'),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/home'),
+          ),
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: [
+                if (state.phase == DownloadPhase.idle) ...[
+                  const Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 16),
+                          Text('Fetching transfer details...'),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ] else if (state.phase == DownloadPhase.preview &&
-                  state.transfer != null) ...[
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.download_for_offline_outlined,
-                        size: 80,
-                        color: AppTheme.primary,
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        '${state.transfer!.totalFiles} files available',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Total Size: ${FileSizeFormatter.format(state.transfer!.totalSize)}',
-                        style: const TextStyle(color: AppTheme.textSecondary),
-                      ),
-                      const SizedBox(height: 32),
-                      ElevatedButton(
-                        onPressed: () =>
-                            _showAdNoticeAndStartDownload(context, notifier),
-                        child: const Text('Start Download'),
-                      ),
-                    ],
-                  ),
-                ),
-              ] else if (state.phase == DownloadPhase.downloading) ...[
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '${(state.overallProgress * 100).toStringAsFixed(1)}%',
-                        style: const TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      LinearProgressIndicator(
-                        value: state.overallProgress,
-                        backgroundColor: AppTheme.cardBg,
-                      ),
-                      const SizedBox(height: 24),
-                      Text(
-                        'Downloading file ${state.currentFileIndex + 1} of ${state.downloadFiles.length}',
-                      ),
-                      const SizedBox(height: 32),
-                      OutlinedButton(
-                        onPressed: () {
-                          notifier.cancelDownload();
-                          if (state.transfer != null) {
-                            ref
-                                .read(transferRepositoryProvider)
-                                .cancelTransfer(state.transfer!.id);
-                          }
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Download cancelled.'),
-                            ),
-                          );
-                          context.go('/home');
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.error,
-                          side: const BorderSide(color: AppTheme.error),
-                        ),
-                        child: const Text('Cancel Download'),
-                      ),
-                    ],
-                  ),
-                ),
-              ] else if (state.phase == DownloadPhase.completed) ...[
-                Expanded(
-                  child: Column(
-                    children: [
-                      const Icon(
-                        Icons.check_circle_outline,
-                        size: 70,
-                        color: AppTheme.secondary,
-                      ),
-                      const SizedBox(height: 16),
-                      const Text(
-                        'Download Complete!',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: state.downloadedPaths.length,
-                          itemBuilder: (context, index) {
-                            final path = state.downloadedPaths[index];
-                            final fileName = path.split('/').last;
-                            return Card(
-                              margin: const EdgeInsets.only(bottom: 8),
-                              child: ListTile(
-                                leading: const Icon(
-                                  Icons.insert_drive_file,
-                                  color: AppTheme.primary,
-                                ),
-                                title: Text(
-                                  fileName,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.open_in_new),
-                                  onPressed: () => notifier.openFile(path),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () => context.go('/home'),
-                        child: const Text('Done'),
-                      ),
-                    ],
-                  ),
-                ),
-              ] else if (state.phase == DownloadPhase.failed) ...[
-                Expanded(
-                  child: Center(
+                ] else if (state.phase == DownloadPhase.preview &&
+                    state.transfer != null) ...[
+                  Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(
-                          Icons.error_outline,
-                          size: 70,
-                          color: AppTheme.error,
+                          Icons.download_for_offline_outlined,
+                          size: 80,
+                          color: AppTheme.primary,
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          state.errorMessage ?? 'Download failed',
-                          style: const TextStyle(fontSize: 16),
+                          '${state.transfer!.totalFiles} files available',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Total Size: ${FileSizeFormatter.format(state.transfer!.totalSize)}',
+                          style: const TextStyle(color: AppTheme.textSecondary),
+                        ),
+                        const SizedBox(height: 32),
                         ElevatedButton(
                           onPressed: () =>
-                              notifier.startDownload(aesKey: widget.aesKey),
-                          child: const Text('Retry Download'),
-                        ),
-                        const SizedBox(height: 12),
-                        TextButton(
-                          onPressed: () => context.go('/home'),
-                          child: const Text('Back to Home'),
+                              _showAdNoticeAndStartDownload(context, notifier),
+                          child: const Text('Start Download'),
                         ),
                       ],
                     ),
                   ),
-                ),
+                ] else if (state.phase == DownloadPhase.downloading) ...[
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '${(state.overallProgress * 100).toStringAsFixed(1)}%',
+                          style: const TextStyle(
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            color: AppTheme.primary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        LinearProgressIndicator(
+                          value: state.overallProgress,
+                          backgroundColor: AppTheme.cardBg,
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          'Downloading file ${state.currentFileIndex + 1} of ${state.downloadFiles.length}',
+                        ),
+                        const SizedBox(height: 32),
+                        OutlinedButton(
+                          onPressed: () {
+                            notifier.cancelDownload();
+                            if (state.transfer != null) {
+                              ref
+                                  .read(transferRepositoryProvider)
+                                  .cancelTransfer(state.transfer!.id);
+                            }
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Download cancelled.'),
+                              ),
+                            );
+                            context.go('/home');
+                          },
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppTheme.error,
+                            side: const BorderSide(color: AppTheme.error),
+                          ),
+                          child: const Text('Cancel Download'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else if (state.phase == DownloadPhase.completed) ...[
+                  Expanded(
+                    child: Column(
+                      children: [
+                        const Icon(
+                          Icons.check_circle_outline,
+                          size: 70,
+                          color: AppTheme.secondary,
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Download Complete!',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: state.downloadedPaths.length,
+                            itemBuilder: (context, index) {
+                              final path = state.downloadedPaths[index];
+                              final fileName = path.split('/').last;
+                              return Card(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                child: ListTile(
+                                  leading: const Icon(
+                                    Icons.insert_drive_file,
+                                    color: AppTheme.primary,
+                                  ),
+                                  title: Text(
+                                    fileName,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.open_in_new),
+                                    onPressed: () => notifier.openFile(path),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => context.go('/home'),
+                          child: const Text('Done'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else if (state.phase == DownloadPhase.failed) ...[
+                  Expanded(
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            size: 70,
+                            color: AppTheme.error,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            state.errorMessage ?? 'Download failed',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                          const SizedBox(height: 24),
+                          ElevatedButton(
+                            onPressed: () =>
+                                notifier.startDownload(aesKey: widget.aesKey),
+                            child: const Text('Retry Download'),
+                          ),
+                          const SizedBox(height: 12),
+                          TextButton(
+                            onPressed: () => context.go('/home'),
+                            child: const Text('Back to Home'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                const AdBannerWidget(),
               ],
-              const SizedBox(height: 16),
-              const AdBannerWidget(),
-            ],
+            ),
           ),
         ),
       ),
