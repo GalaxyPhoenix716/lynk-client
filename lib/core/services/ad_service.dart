@@ -23,16 +23,19 @@ class AdService {
   }
 
   static Future<void> init() async {
+    if (kIsWeb) return;
     await MobileAds.instance.initialize();
   }
 
   static Future<bool> shouldShowAds() async {
+    if (kIsWeb) return false;
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('ads_enabled') ?? true;
   }
 
   static Future<void> preloadInterstitialAd() async {
-    if (!await shouldShowAds() ||
+    if (kIsWeb ||
+        !await shouldShowAds() ||
         _isInterstitialLoading ||
         _interstitialAd != null) {
       return;
@@ -56,7 +59,7 @@ class AdService {
   }
 
   static Future<void> showInterstitialAd() async {
-    if (!await shouldShowAds()) return;
+    if (kIsWeb || !await shouldShowAds()) return;
 
     if (_interstitialAd == null) {
       await preloadInterstitialAd();
