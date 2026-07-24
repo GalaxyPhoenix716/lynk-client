@@ -21,7 +21,9 @@ class _QrScanScreenState extends State<QrScanScreen> {
 
     // Pattern 1: Clean URL format (https://lynk.app/send/xyz#aesKey or https://lynk.app/receive/abc)
     final uri = Uri.tryParse(rawValue);
-    if (uri != null && (uri.scheme == 'https' || uri.scheme == 'http') && uri.host == 'lynk.app') {
+    if (uri != null &&
+        (uri.scheme == 'https' || uri.scheme == 'http') &&
+        uri.host == 'lynk.app') {
       final segments = uri.pathSegments;
       if (segments.length >= 2) {
         final action = segments[0];

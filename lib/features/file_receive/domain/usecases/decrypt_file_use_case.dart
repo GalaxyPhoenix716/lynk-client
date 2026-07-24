@@ -15,7 +15,9 @@ class DecryptFileUseCase {
   }) async {
     final encryptedBytes = await encryptedFile.readAsBytes();
     if (encryptedBytes.length < 16) {
-      throw const FormatException('Encrypted file payload is truncated or invalid');
+      throw const FormatException(
+        'Encrypted file payload is truncated or invalid',
+      );
     }
 
     final ivBytes = encryptedBytes.sublist(0, 16);
@@ -25,7 +27,10 @@ class DecryptFileUseCase {
     final iv = enc.IV(ivBytes);
 
     final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.cbc));
-    final decryptedBytes = encrypter.decryptBytes(enc.Encrypted(ciphertext), iv: iv);
+    final decryptedBytes = encrypter.decryptBytes(
+      enc.Encrypted(ciphertext),
+      iv: iv,
+    );
 
     final outputFile = File(outputPath);
     await outputFile.writeAsBytes(decryptedBytes);
@@ -38,7 +43,9 @@ class DecryptFileUseCase {
     required String aesKey32Bytes,
   }) {
     if (encryptedBytes.length < 16) {
-      throw const FormatException('Encrypted bytes payload is truncated or invalid');
+      throw const FormatException(
+        'Encrypted bytes payload is truncated or invalid',
+      );
     }
 
     final ivBytes = encryptedBytes.sublist(0, 16);

@@ -9,11 +9,7 @@ import '../../domain/entities/transfer.dart';
 class SendQrScreen extends StatefulWidget {
   final Transfer transfer;
   final String aesKey;
-  const SendQrScreen({
-    super.key,
-    required this.transfer,
-    this.aesKey = '',
-  });
+  const SendQrScreen({super.key, required this.transfer, this.aesKey = ''});
 
   @override
   State<SendQrScreen> createState() => _SendQrScreenState();
@@ -49,7 +45,8 @@ class _SendQrScreenState extends State<SendQrScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final qrData = 'https://lynk.app/send/${widget.transfer.id}#${widget.aesKey}';
+    final qrData =
+        'https://lynk.app/send/${widget.transfer.id}#${widget.aesKey}';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Share Transfer')),

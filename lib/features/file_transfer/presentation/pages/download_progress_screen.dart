@@ -83,7 +83,8 @@ class _DownloadProgressScreenState
                       ),
                       const SizedBox(height: 32),
                       ElevatedButton(
-                        onPressed: () => notifier.startDownload(aesKey: widget.aesKey),
+                        onPressed: () =>
+                            notifier.startDownload(aesKey: widget.aesKey),
                         child: const Text('Start Download'),
                       ),
                     ],

@@ -7,12 +7,13 @@ void main() {
   group('DecryptFileUseCase', () {
     final encryptUseCase = EncryptFileUseCase();
     final decryptUseCase = DecryptFileUseCase();
-    
+
     late File originalFile;
     late File encryptedFile;
     late File decryptedFile;
     late String aesKey;
-    const testContent = 'Secure client-side end-to-end decryption verification payload.';
+    const testContent =
+        'Secure client-side end-to-end decryption verification payload.';
 
     setUp(() async {
       originalFile = File('original_payload_test.txt');
@@ -33,15 +34,18 @@ void main() {
       if (decryptedFile.existsSync()) decryptedFile.deleteSync();
     });
 
-    test('execute extracts prepended IV and decrypts AES-256-CBC ciphertext back to original plaintext', () async {
-      final result = await decryptUseCase.execute(
-        encryptedFile: encryptedFile,
-        aesKey32Bytes: aesKey,
-        outputPath: decryptedFile.path,
-      );
+    test(
+      'execute extracts prepended IV and decrypts AES-256-CBC ciphertext back to original plaintext',
+      () async {
+        final result = await decryptUseCase.execute(
+          encryptedFile: encryptedFile,
+          aesKey32Bytes: aesKey,
+          outputPath: decryptedFile.path,
+        );
 
-      expect(result.existsSync(), true);
-      expect(result.readAsStringSync(), testContent);
-    });
+        expect(result.existsSync(), true);
+        expect(result.readAsStringSync(), testContent);
+      },
+    );
   });
 }
