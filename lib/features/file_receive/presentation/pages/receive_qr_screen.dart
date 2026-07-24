@@ -79,7 +79,7 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: QrImageView(
-                    data: '{"session_id":"${state.session!.id}"}',
+                    data: 'https://lynk.app/receive/${state.session!.id}',
                     version: QrVersions.auto,
                     size: 220.0,
                     backgroundColor: Colors.white,
@@ -115,12 +115,19 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
                   ],
                 ),
               ] else if (state.errorMessage != null) ...[
-                const Icon(Icons.error_outline, size: 60, color: AppTheme.error),
+                const Icon(
+                  Icons.error_outline,
+                  size: 60,
+                  color: AppTheme.error,
+                ),
                 const SizedBox(height: 16),
                 Text(
                   state.errorMessage!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: AppTheme.textPrimary, fontSize: 16),
+                  style: const TextStyle(
+                    color: AppTheme.textPrimary,
+                    fontSize: 16,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(

@@ -49,7 +49,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 if (context.mounted) {
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Ads disabled on this device!')),
+                    const SnackBar(
+                      content: Text('Ads disabled on this device!'),
+                    ),
                   );
                 }
               }
@@ -70,7 +72,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('lynk', style: Theme.of(context).textTheme.headlineMedium?.copyWith(letterSpacing: 2)),
+              Text(
+                'lynk',
+                style: Theme.of(
+                  context,
+                ).textTheme.headlineMedium?.copyWith(letterSpacing: 2),
+              ),
               const SizedBox(height: 32),
               Expanded(
                 child: Column(
@@ -101,7 +108,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Center(
                 child: GestureDetector(
                   onTap: _onVersionTap,
-                  child: const Text('v1.0.0+1', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+                  child: const Text(
+                    'v1.0.0+1',
+                    style: TextStyle(
+                      color: AppTheme.textSecondary,
+                      fontSize: 12,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -118,7 +131,12 @@ class _ActionCard extends StatelessWidget {
   final String subtitle;
   final VoidCallback onTap;
 
-  const _ActionCard({required this.icon, required this.title, required this.subtitle, required this.onTap});
+  const _ActionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -24,21 +24,33 @@ class DownloadNotifier extends _$DownloadNotifier {
     final result = await repo.getTransferMetadata(transferId);
 
     result.fold(
-      (transfer) => state = state.copyWith(transfer: transfer, phase: DownloadPhase.preview),
-      (failure) => state = state.copyWith(phase: DownloadPhase.failed, errorMessage: failure.message),
+      (transfer) => state = state.copyWith(
+        transfer: transfer,
+        phase: DownloadPhase.preview,
+      ),
+      (failure) => state = state.copyWith(
+        phase: DownloadPhase.failed,
+        errorMessage: failure.message,
+      ),
     );
   }
 
   Future<void> startDownload() async {
     if (state.transfer == null) return;
 
-    state = state.copyWith(phase: DownloadPhase.downloading, currentFileIndex: 0, overallProgress: 0.0);
+    state = state.copyWith(
+      phase: DownloadPhase.downloading,
+      currentFileIndex: 0,
+      overallProgress: 0.0,
+    );
     _cancelToken = CancelToken();
 
     final repo = ref.read(transferRepositoryProvider);
     final downloadService = ref.read(downloadServiceProvider);
 
-    final urlResult = await repo.getDownloadUrls(transferId: state.transfer!.id);
+    final urlResult = await repo.getDownloadUrls(
+      transferId: state.transfer!.id,
+    );
 
     urlResult.fold(
       (downloadFiles) async {
@@ -63,7 +75,9 @@ class DownloadNotifier extends _$DownloadNotifier {
               cancelToken: _cancelToken,
               onProgress: (received, total) {
                 final fileProgress = total > 0 ? received / total : 0.0;
-                final overall = totalSize > 0 ? (cumulativeBytes + received) / totalSize : 0.0;
+                final overall = totalSize > 0
+                    ? (cumulativeBytes + received) / totalSize
+                    : 0.0;
                 state = state.copyWith(
                   currentFileProgress: fileProgress,
                   overallProgress: overall.clamp(0.0, 1.0),
@@ -75,7 +89,10 @@ class DownloadNotifier extends _$DownloadNotifier {
             cumulativeBytes += item.size;
           } catch (e) {
             if (_cancelToken?.isCancelled ?? false) return;
-            state = state.copyWith(phase: DownloadPhase.failed, errorMessage: 'Failed downloading ${item.name}');
+            state = state.copyWith(
+              phase: DownloadPhase.failed,
+              errorMessage: 'Failed downloading ${item.name}',
+            );
             return;
           }
         }
@@ -87,7 +104,10 @@ class DownloadNotifier extends _$DownloadNotifier {
         );
       },
       (failure) async {
-        state = state.copyWith(phase: DownloadPhase.failed, errorMessage: failure.message);
+        state = state.copyWith(
+          phase: DownloadPhase.failed,
+          errorMessage: failure.message,
+        );
       },
     );
   }

@@ -11,7 +11,9 @@ class MockReceiverRemoteDataSource implements ReceiverRemoteDataSource {
   @override
   Future<ReceiverSessionModel> createReceiverSession() async {
     if (shouldThrowDioException) {
-      throw DioException(requestOptions: RequestOptions(path: '/receiver-sessions'));
+      throw DioException(
+        requestOptions: RequestOptions(path: '/receiver-sessions'),
+      );
     }
     return const ReceiverSessionModel(
       id: 'sess_123',
@@ -23,7 +25,9 @@ class MockReceiverRemoteDataSource implements ReceiverRemoteDataSource {
   @override
   Future<ReceiverSessionModel> getReceiverSession(String sessionId) async {
     if (shouldThrowDioException) {
-      throw DioException(requestOptions: RequestOptions(path: '/receiver-sessions/$sessionId'));
+      throw DioException(
+        requestOptions: RequestOptions(path: '/receiver-sessions/$sessionId'),
+      );
     }
     return ReceiverSessionModel(
       id: sessionId,
@@ -33,7 +37,10 @@ class MockReceiverRemoteDataSource implements ReceiverRemoteDataSource {
   }
 
   @override
-  Future<void> attachTransfer({required String sessionId, required String transferId}) async {
+  Future<void> attachTransfer({
+    required String sessionId,
+    required String transferId,
+  }) async {
     if (shouldThrowDioException) {
       throw DioException(requestOptions: RequestOptions(path: '/attach'));
     }
@@ -71,10 +78,13 @@ void main() {
       expect(result.value?.transferId, 'tx_555');
     });
 
-    test('createReceiverSession returns Result.failure on DioException', () async {
-      mockDataSource.shouldThrowDioException = true;
-      final result = await repository.createReceiverSession();
-      expect(result.isFailure, isTrue);
-    });
+    test(
+      'createReceiverSession returns Result.failure on DioException',
+      () async {
+        mockDataSource.shouldThrowDioException = true;
+        final result = await repository.createReceiverSession();
+        expect(result.isFailure, isTrue);
+      },
+    );
   });
 }

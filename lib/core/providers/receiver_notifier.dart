@@ -11,9 +11,19 @@ class ReceiverState {
   final String? attachedTransferId;
   final String? errorMessage;
 
-  const ReceiverState({this.session, this.isPolling = false, this.attachedTransferId, this.errorMessage});
+  const ReceiverState({
+    this.session,
+    this.isPolling = false,
+    this.attachedTransferId,
+    this.errorMessage,
+  });
 
-  ReceiverState copyWith({ReceiverSession? session, bool? isPolling, String? attachedTransferId, String? errorMessage}) {
+  ReceiverState copyWith({
+    ReceiverSession? session,
+    bool? isPolling,
+    String? attachedTransferId,
+    String? errorMessage,
+  }) {
     return ReceiverState(
       session: session ?? this.session,
       isPolling: isPolling ?? this.isPolling,
@@ -52,22 +62,25 @@ class ReceiverNotifier extends _$ReceiverNotifier {
       final repo = ref.read(receiverRepositoryProvider);
       final result = await repo.getReceiverSession(sessionId);
 
-      result.fold(
-        (session) {
-          if (session.status == ReceiverSessionStatus.attached && session.transferId != null) {
-            _pollingTimer?.cancel();
-            state = state.copyWith(isPolling: false, attachedTransferId: session.transferId);
-          }
-        },
-        (_) {},
-      );
+      result.fold((session) {
+        if (session.status == ReceiverSessionStatus.attached &&
+            session.transferId != null) {
+          _pollingTimer?.cancel();
+          state = state.copyWith(
+            isPolling: false,
+            attachedTransferId: session.transferId,
+          );
+        }
+      }, (_) {});
     });
   }
 
   void cancelSession() {
     _pollingTimer?.cancel();
     if (state.session != null) {
-      ref.read(receiverRepositoryProvider).cancelReceiverSession(state.session!.id);
+      ref
+          .read(receiverRepositoryProvider)
+          .cancelReceiverSession(state.session!.id);
     }
     state = const ReceiverState();
   }

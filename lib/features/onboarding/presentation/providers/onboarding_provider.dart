@@ -5,7 +5,9 @@ part 'onboarding_provider.g.dart';
 
 @riverpod
 SharedPreferences sharedPreferences(Ref ref) {
-  throw UnimplementedError('Override sharedPreferencesProvider in main() via ProviderScope');
+  throw UnimplementedError(
+    'Override sharedPreferencesProvider in main() via ProviderScope',
+  );
 }
 
 @riverpod

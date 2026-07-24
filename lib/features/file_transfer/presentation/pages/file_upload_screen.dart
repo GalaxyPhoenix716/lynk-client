@@ -35,9 +35,16 @@ class FileUploadScreen extends ConsumerWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.cloud_upload_outlined, size: 80, color: AppTheme.primary),
+                        const Icon(
+                          Icons.cloud_upload_outlined,
+                          size: 80,
+                          color: AppTheme.primary,
+                        ),
                         const SizedBox(height: 16),
-                        const Text('Select files to transfer', style: TextStyle(color: AppTheme.textSecondary)),
+                        const Text(
+                          'Select files to transfer',
+                          style: TextStyle(color: AppTheme.textSecondary),
+                        ),
                         const SizedBox(height: 24),
                         ElevatedButton(
                           onPressed: () => notifier.pickFiles(),
@@ -58,9 +65,16 @@ class FileUploadScreen extends ConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('${uploadState.selectedFiles.length} files selected'),
-                      Text('${FileSizeFormatter.format(uploadState.totalSize)} / 500 MB',
-                          style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold)),
+                      Text(
+                        '${uploadState.selectedFiles.length} files selected',
+                      ),
+                      Text(
+                        '${FileSizeFormatter.format(uploadState.totalSize)} / 500 MB',
+                        style: const TextStyle(
+                          color: AppTheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -73,10 +87,17 @@ class FileUploadScreen extends ConsumerWidget {
                       return Card(
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
-                          title: Text(f.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+                          title: Text(
+                            f.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           subtitle: Text(FileSizeFormatter.format(f.size)),
                           trailing: IconButton(
-                            icon: const Icon(Icons.close, color: AppTheme.error),
+                            icon: const Icon(
+                              Icons.close,
+                              color: AppTheme.error,
+                            ),
                             onPressed: () => notifier.removeFile(index),
                           ),
                         ),
@@ -95,7 +116,9 @@ class FileUploadScreen extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () => notifier.startUpload(attachToSessionId: attachToSessionId),
+                        onPressed: () => notifier.startUpload(
+                          attachToSessionId: attachToSessionId,
+                        ),
                         child: const Text('Initiate Transfer'),
                       ),
                     ),
@@ -106,16 +129,30 @@ class FileUploadScreen extends ConsumerWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('${(uploadState.overallProgress * 100).toStringAsFixed(1)}%',
-                          style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: AppTheme.primary)),
+                      Text(
+                        '${(uploadState.overallProgress * 100).toStringAsFixed(1)}%',
+                        style: const TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primary,
+                        ),
+                      ),
                       const SizedBox(height: 16),
-                      LinearProgressIndicator(value: uploadState.overallProgress, backgroundColor: AppTheme.cardBg),
+                      LinearProgressIndicator(
+                        value: uploadState.overallProgress,
+                        backgroundColor: AppTheme.cardBg,
+                      ),
                       const SizedBox(height: 24),
-                      Text('Uploading file ${uploadState.currentFileIndex + 1} of ${uploadState.selectedFiles.length}'),
+                      Text(
+                        'Uploading file ${uploadState.currentFileIndex + 1} of ${uploadState.selectedFiles.length}',
+                      ),
                       const SizedBox(height: 32),
                       OutlinedButton(
                         onPressed: () => notifier.cancelUpload(),
-                        style: OutlinedButton.styleFrom(foregroundColor: AppTheme.error, side: const BorderSide(color: AppTheme.error)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.error,
+                          side: const BorderSide(color: AppTheme.error),
+                        ),
                         child: const Text('Cancel Transfer'),
                       ),
                     ],

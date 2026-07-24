@@ -34,14 +34,12 @@ GoRouter appRouter(Ref ref) {
         path: '/onboarding',
         builder: (context, state) => const OnboardingScreen(),
       ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
-      ),
+      GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
       GoRoute(
         path: '/upload',
         builder: (context, state) {
-          final attachToSessionId = state.uri.queryParameters['attachToSessionId'];
+          final attachToSessionId =
+              state.uri.queryParameters['attachToSessionId'];
           return FileUploadScreen(attachToSessionId: attachToSessionId);
         },
       ),

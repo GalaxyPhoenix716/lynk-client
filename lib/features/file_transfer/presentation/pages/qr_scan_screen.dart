@@ -19,6 +19,26 @@ class _QrScanScreenState extends State<QrScanScreen> {
     final rawValue = capture.barcodes.first.rawValue;
     if (rawValue == null) return;
 
+    // Pattern 1: Clean URL format (https://lynk.app/send/xyz or https://lynk.app/receive/abc)
+    if (rawValue.startsWith('https://lynk.app/')) {
+      final path = rawValue.replaceFirst('https://lynk.app/', '');
+      final segments = path.split('/');
+      if (segments.length >= 2) {
+        final action = segments[0];
+        final id = segments[1];
+        if (action == 'send') {
+          _scanned = true;
+          context.go('/download-progress/$id');
+          return;
+        } else if (action == 'receive') {
+          _scanned = true;
+          context.go('/upload?attachToSessionId=$id');
+          return;
+        }
+      }
+    }
+
+    // Pattern 2: Legacy JSON format fallback
     try {
       final json = jsonDecode(rawValue);
       if (json is Map<String, dynamic>) {
@@ -27,7 +47,8 @@ class _QrScanScreenState extends State<QrScanScreen> {
           final transferId = json['transfer_id'] as String;
           context.go('/download-progress/$transferId');
           return;
-        } else if (json.containsKey('session_id') && json['session_id'] is String) {
+        } else if (json.containsKey('session_id') &&
+            json['session_id'] is String) {
           _scanned = true;
           final sessionId = json['session_id'] as String;
           context.go('/upload?attachToSessionId=$sessionId');

@@ -11,14 +11,20 @@ class DownloadProgressScreen extends ConsumerStatefulWidget {
   const DownloadProgressScreen({super.key, required this.transferId});
 
   @override
-  ConsumerState<DownloadProgressScreen> createState() => _DownloadProgressScreenState();
+  ConsumerState<DownloadProgressScreen> createState() =>
+      _DownloadProgressScreenState();
 }
 
-class _DownloadProgressScreenState extends ConsumerState<DownloadProgressScreen> {
+class _DownloadProgressScreenState
+    extends ConsumerState<DownloadProgressScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(downloadProvider.notifier).loadTransferPreview(widget.transferId));
+    Future.microtask(
+      () => ref
+          .read(downloadProvider.notifier)
+          .loadTransferPreview(widget.transferId),
+    );
   }
 
   @override
@@ -46,18 +52,30 @@ class _DownloadProgressScreenState extends ConsumerState<DownloadProgressScreen>
                     ),
                   ),
                 ),
-              ] else if (state.phase == DownloadPhase.preview && state.transfer != null) ...[
+              ] else if (state.phase == DownloadPhase.preview &&
+                  state.transfer != null) ...[
                 Expanded(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.download_for_offline_outlined, size: 80, color: AppTheme.primary),
+                      const Icon(
+                        Icons.download_for_offline_outlined,
+                        size: 80,
+                        color: AppTheme.primary,
+                      ),
                       const SizedBox(height: 16),
-                      Text('${state.transfer!.totalFiles} files available',
-                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                      Text(
+                        '${state.transfer!.totalFiles} files available',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(height: 8),
-                      Text('Total Size: ${FileSizeFormatter.format(state.transfer!.totalSize)}',
-                          style: const TextStyle(color: AppTheme.textSecondary)),
+                      Text(
+                        'Total Size: ${FileSizeFormatter.format(state.transfer!.totalSize)}',
+                        style: const TextStyle(color: AppTheme.textSecondary),
+                      ),
                       const SizedBox(height: 32),
                       ElevatedButton(
                         onPressed: () => notifier.startDownload(),
@@ -71,16 +89,30 @@ class _DownloadProgressScreenState extends ConsumerState<DownloadProgressScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('${(state.overallProgress * 100).toStringAsFixed(1)}%',
-                          style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold, color: AppTheme.primary)),
+                      Text(
+                        '${(state.overallProgress * 100).toStringAsFixed(1)}%',
+                        style: const TextStyle(
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          color: AppTheme.primary,
+                        ),
+                      ),
                       const SizedBox(height: 16),
-                      LinearProgressIndicator(value: state.overallProgress, backgroundColor: AppTheme.cardBg),
+                      LinearProgressIndicator(
+                        value: state.overallProgress,
+                        backgroundColor: AppTheme.cardBg,
+                      ),
                       const SizedBox(height: 24),
-                      Text('Downloading file ${state.currentFileIndex + 1} of ${state.downloadFiles.length}'),
+                      Text(
+                        'Downloading file ${state.currentFileIndex + 1} of ${state.downloadFiles.length}',
+                      ),
                       const SizedBox(height: 32),
                       OutlinedButton(
                         onPressed: () => notifier.cancelDownload(),
-                        style: OutlinedButton.styleFrom(foregroundColor: AppTheme.error, side: const BorderSide(color: AppTheme.error)),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.error,
+                          side: const BorderSide(color: AppTheme.error),
+                        ),
                         child: const Text('Cancel Download'),
                       ),
                     ],
@@ -90,9 +122,19 @@ class _DownloadProgressScreenState extends ConsumerState<DownloadProgressScreen>
                 Expanded(
                   child: Column(
                     children: [
-                      const Icon(Icons.check_circle_outline, size: 70, color: AppTheme.secondary),
+                      const Icon(
+                        Icons.check_circle_outline,
+                        size: 70,
+                        color: AppTheme.secondary,
+                      ),
                       const SizedBox(height: 16),
-                      const Text('Download Complete!', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                      const Text(
+                        'Download Complete!',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       const SizedBox(height: 16),
                       Expanded(
                         child: ListView.builder(
@@ -103,8 +145,15 @@ class _DownloadProgressScreenState extends ConsumerState<DownloadProgressScreen>
                             return Card(
                               margin: const EdgeInsets.only(bottom: 8),
                               child: ListTile(
-                                leading: const Icon(Icons.insert_drive_file, color: AppTheme.primary),
-                                title: Text(fileName, maxLines: 1, overflow: TextOverflow.ellipsis),
+                                leading: const Icon(
+                                  Icons.insert_drive_file,
+                                  color: AppTheme.primary,
+                                ),
+                                title: Text(
+                                  fileName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                                 trailing: IconButton(
                                   icon: const Icon(Icons.open_in_new),
                                   onPressed: () => notifier.openFile(path),
@@ -127,9 +176,16 @@ class _DownloadProgressScreenState extends ConsumerState<DownloadProgressScreen>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline, size: 70, color: AppTheme.error),
+                        const Icon(
+                          Icons.error_outline,
+                          size: 70,
+                          color: AppTheme.error,
+                        ),
                         const SizedBox(height: 16),
-                        Text(state.errorMessage ?? 'Download failed', style: const TextStyle(fontSize: 16)),
+                        Text(
+                          state.errorMessage ?? 'Download failed',
+                          style: const TextStyle(fontSize: 16),
+                        ),
                         const SizedBox(height: 24),
                         ElevatedButton(
                           onPressed: () => context.go('/home'),

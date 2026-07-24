@@ -34,7 +34,10 @@ class MockTransferRemoteDataSource implements TransferRemoteDataSource {
   }
 
   @override
-  Future<void> completeFileUpload({required String transferId, required String fileId}) async {
+  Future<void> completeFileUpload({
+    required String transferId,
+    required String fileId,
+  }) async {
     if (shouldThrowDioException) {
       throw DioException(requestOptions: RequestOptions(path: '/complete'));
     }
@@ -62,7 +65,10 @@ class MockTransferRemoteDataSource implements TransferRemoteDataSource {
   }
 
   @override
-  Future<List<FileItemModel>> getDownloadUrls({required String transferId, List<String>? fileIds}) async {
+  Future<List<FileItemModel>> getDownloadUrls({
+    required String transferId,
+    List<String>? fileIds,
+  }) async {
     if (shouldThrowDioException) {
       throw DioException(requestOptions: RequestOptions(path: '/downloads'));
     }
@@ -74,7 +80,7 @@ class MockTransferRemoteDataSource implements TransferRemoteDataSource {
         contentType: 'text/plain',
         status: FileStatus.uploaded,
         downloadUrl: 'https://r2.mock/download',
-      )
+      ),
     ];
   }
 
@@ -96,32 +102,56 @@ void main() {
       repository = TransferRepositoryImpl(remoteDataSource: mockDataSource);
     });
 
-    test('createTransfer returns Result.success on successful response', () async {
-      const file = FileItem(id: '', name: 'test.png', size: 500, contentType: 'image/png', status: FileStatus.pending);
-      final result = await repository.createTransfer([file]);
+    test(
+      'createTransfer returns Result.success on successful response',
+      () async {
+        const file = FileItem(
+          id: '',
+          name: 'test.png',
+          size: 500,
+          contentType: 'image/png',
+          status: FileStatus.pending,
+        );
+        final result = await repository.createTransfer([file]);
 
-      expect(result.isSuccess, isTrue);
-      expect(result.value?.id, 'tx_mock_123');
-    });
+        expect(result.isSuccess, isTrue);
+        expect(result.value?.id, 'tx_mock_123');
+      },
+    );
 
-    test('createTransfer returns Result.failure with ServerFailure on DioException', () async {
-      mockDataSource.shouldThrowDioException = true;
-      mockDataSource.statusCode = 413;
-      mockDataSource.errorMessage = 'Active storage capacity limit reached';
+    test(
+      'createTransfer returns Result.failure with ServerFailure on DioException',
+      () async {
+        mockDataSource.shouldThrowDioException = true;
+        mockDataSource.statusCode = 413;
+        mockDataSource.errorMessage = 'Active storage capacity limit reached';
 
-      const file = FileItem(id: '', name: 'test.png', size: 500, contentType: 'image/png', status: FileStatus.pending);
-      final result = await repository.createTransfer([file]);
+        const file = FileItem(
+          id: '',
+          name: 'test.png',
+          size: 500,
+          contentType: 'image/png',
+          status: FileStatus.pending,
+        );
+        final result = await repository.createTransfer([file]);
 
-      expect(result.isFailure, isTrue);
-      expect(result.failure?.message, 'Active storage capacity limit reached');
-    });
+        expect(result.isFailure, isTrue);
+        expect(
+          result.failure?.message,
+          'Active storage capacity limit reached',
+        );
+      },
+    );
 
-    test('getTransferMetadata returns Result.failure when transfer is not found', () async {
-      mockDataSource.shouldThrowDioException = true;
-      final result = await repository.getTransferMetadata('non_existent_id');
+    test(
+      'getTransferMetadata returns Result.failure when transfer is not found',
+      () async {
+        mockDataSource.shouldThrowDioException = true;
+        final result = await repository.getTransferMetadata('non_existent_id');
 
-      expect(result.isFailure, isTrue);
-      expect(result.failure?.message, 'Transfer not found');
-    });
+        expect(result.isFailure, isTrue);
+        expect(result.failure?.message, 'Transfer not found');
+      },
+    );
   });
 }

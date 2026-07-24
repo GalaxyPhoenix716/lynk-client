@@ -44,7 +44,7 @@ class _SendQrScreenState extends State<SendQrScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final qrData = '{"transfer_id":"${widget.transfer.id}"}';
+    final qrData = 'https://lynk.app/send/${widget.transfer.id}';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Share Transfer')),

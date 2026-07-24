@@ -5,7 +5,9 @@ import 'package:client/features/home/presentation/pages/home_screen.dart';
 import 'package:client/features/onboarding/presentation/providers/onboarding_provider.dart';
 
 void main() {
-  testWidgets('Smoke test for GoRouter navigation rendering HomeScreen', (WidgetTester tester) async {
+  testWidgets('Smoke test for GoRouter navigation rendering HomeScreen', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [

@@ -49,13 +49,13 @@ class DownloadState extends Equatable {
 
   @override
   List<Object?> get props => [
-        transfer,
-        downloadFiles,
-        currentFileIndex,
-        currentFileProgress,
-        overallProgress,
-        phase,
-        downloadedPaths,
-        errorMessage,
-      ];
+    transfer,
+    downloadFiles,
+    currentFileIndex,
+    currentFileProgress,
+    overallProgress,
+    phase,
+    downloadedPaths,
+    errorMessage,
+  ];
 }

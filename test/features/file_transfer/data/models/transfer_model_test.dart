@@ -18,7 +18,7 @@ void main() {
             'file_size': 1024,
             'content_type': 'application/pdf',
             'status': 'uploaded',
-          }
+          },
         ],
       };
 
@@ -47,7 +47,7 @@ void main() {
             'file_size': 500,
             'content_type': 'text/plain',
             'status': 'pending',
-          }
+          },
         ],
       };
 
