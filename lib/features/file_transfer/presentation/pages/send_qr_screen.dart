@@ -98,8 +98,10 @@ class _SendQrScreenState extends ConsumerState<SendQrScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final qrData =
-        'https://lynk.app/send/${widget.transfer.id}#${widget.aesKey}';
+    final key = widget.aesKey.isNotEmpty
+        ? widget.aesKey
+        : (ref.read(uploadProvider).aesKey ?? '');
+    final qrData = 'https://lynk.app/send/${widget.transfer.id}#$key';
 
     return PopScope(
       canPop: true,

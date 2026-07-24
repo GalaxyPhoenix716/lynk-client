@@ -8,6 +8,7 @@ abstract class ReceiverRemoteDataSource {
   Future<void> attachTransfer({
     required String sessionId,
     required String transferId,
+    String? aesKey,
   });
 
   Future<void> cancelReceiverSession(String sessionId);

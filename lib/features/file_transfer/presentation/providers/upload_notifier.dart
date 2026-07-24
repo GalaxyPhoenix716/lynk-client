@@ -183,6 +183,7 @@ class UploadNotifier extends _$UploadNotifier {
           await receiverRepo.attachTransfer(
             sessionId: attachToSessionId,
             transferId: transfer.id,
+            aesKey: aesKey,
           );
         }
 

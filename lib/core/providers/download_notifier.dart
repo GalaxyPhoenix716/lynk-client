@@ -6,8 +6,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../services/download_service.dart';
 import 'download_state.dart';
+import 'receiver_notifier.dart';
 import 'transfer_providers.dart';
 import '../../features/file_receive/domain/usecases/decrypt_file_use_case.dart';
+import '../../features/file_transfer/presentation/providers/upload_notifier.dart';
 
 part 'download_notifier.g.dart';
 
@@ -60,7 +62,20 @@ class DownloadNotifier extends _$DownloadNotifier {
     urlResult.fold(
       (downloadFiles) async {
         state = state.copyWith(downloadFiles: downloadFiles);
-        final dir = kIsWeb ? null : await getApplicationDocumentsDirectory();
+
+        Directory? saveDir;
+        if (!kIsWeb) {
+          if (Platform.isAndroid) {
+            final lynkPublicDir = Directory('/storage/emulated/0/Download/Lynk');
+            if (!await lynkPublicDir.exists()) {
+              await lynkPublicDir.create(recursive: true);
+            }
+            saveDir = lynkPublicDir;
+          } else {
+            saveDir = await getApplicationDocumentsDirectory();
+          }
+        }
+
         final downloadedPaths = <String>[];
         int cumulativeBytes = 0;
         final totalSize = state.transfer!.totalSize;
@@ -72,7 +87,13 @@ class DownloadNotifier extends _$DownloadNotifier {
           state = state.copyWith(currentFileIndex: i, currentFileProgress: 0.0);
 
           try {
-            final key = aesKey ?? state.aesKey;
+            String? key = (aesKey != null && aesKey.isNotEmpty) ? aesKey : state.aesKey;
+            if (key == null || key.isEmpty) {
+              key = ref.read(receiverProvider).attachedAesKey;
+            }
+            if (key == null || key.isEmpty) {
+              key = ref.read(uploadProvider).aesKey;
+            }
 
             if (kIsWeb) {
               final encBytes = await downloadService.downloadBytesFromR2(
@@ -99,7 +120,7 @@ class DownloadNotifier extends _$DownloadNotifier {
               }
               downloadedPaths.add('${item.name} (${finalBytes.length} bytes)');
             } else {
-              final savePath = '${dir!.path}/${item.name}';
+              final savePath = '${saveDir!.path}/${item.name}';
               final tempSavePath = '$savePath.enc';
 
               await downloadService.downloadFileFromR2(
@@ -118,7 +139,7 @@ class DownloadNotifier extends _$DownloadNotifier {
                 },
               );
 
-              // Decrypt the downloaded file if a key is available
+              // Decrypt the downloaded file using resolved key
               if (key != null && key.isNotEmpty) {
                 await decryptUseCase.execute(
                   encryptedFile: File(tempSavePath),
@@ -130,10 +151,9 @@ class DownloadNotifier extends _$DownloadNotifier {
                   await tempFile.delete();
                 }
               } else {
-                final tempFile = File(tempSavePath);
-                if (await tempFile.exists()) {
-                  await tempFile.rename(savePath);
-                }
+                throw Exception(
+                  'Decryption key missing for file "${item.name}". Please scan QR code again.',
+                );
               }
 
               downloadedPaths.add(savePath);

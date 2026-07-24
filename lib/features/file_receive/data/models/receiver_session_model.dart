@@ -5,6 +5,7 @@ class ReceiverSessionModel extends ReceiverSession {
     required super.id,
     required super.status,
     super.transferId,
+    super.aesKey,
     super.expiresMultiplier,
   });
 
@@ -25,6 +26,7 @@ class ReceiverSessionModel extends ReceiverSession {
       id: (json['session_id'] ?? json['id']) as String? ?? '',
       status: parseStatus(json['status'] as String?),
       transferId: json['transfer_id'] as String?,
+      aesKey: json['aes_key'] as String?,
       expiresMultiplier:
           json['expires_in'] as int? ?? json['expires_at_seconds'] as int?,
     );
@@ -46,6 +48,7 @@ class ReceiverSessionModel extends ReceiverSession {
       'session_id': id,
       'status': statusString(status),
       if (transferId != null) 'transfer_id': transferId,
+      if (aesKey != null) 'aes_key': aesKey,
       if (expiresMultiplier != null) 'expires_in': expiresMultiplier,
     };
   }
@@ -55,6 +58,7 @@ class ReceiverSessionModel extends ReceiverSession {
       id: entity.id,
       status: entity.status,
       transferId: entity.transferId,
+      aesKey: entity.aesKey,
       expiresMultiplier: entity.expiresMultiplier,
     );
   }

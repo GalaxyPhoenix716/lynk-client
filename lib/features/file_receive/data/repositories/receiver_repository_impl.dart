@@ -32,11 +32,13 @@ class ReceiverRepositoryImpl implements ReceiverRepository {
   Future<Result<void>> attachTransfer({
     required String sessionId,
     required String transferId,
+    String? aesKey,
   }) async {
     try {
       await remoteDataSource.attachTransfer(
         sessionId: sessionId,
         transferId: transferId,
+        aesKey: aesKey,
       );
       return Result.success(null);
     } catch (e) {

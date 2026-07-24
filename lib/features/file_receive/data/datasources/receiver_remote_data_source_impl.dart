@@ -22,10 +22,14 @@ class ReceiverRemoteDataSourceImpl implements ReceiverRemoteDataSource {
   Future<void> attachTransfer({
     required String sessionId,
     required String transferId,
+    String? aesKey,
   }) async {
     await dio.post(
       'receiver-sessions/$sessionId/attach-transfer',
-      data: {'transfer_id': transferId},
+      data: {
+        'transfer_id': transferId,
+        if (aesKey != null && aesKey.isNotEmpty) 'aes_key': aesKey,
+      },
     );
   }
 

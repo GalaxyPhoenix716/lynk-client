@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -6,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AdService {
   static InterstitialAd? _interstitialAd;
   static bool _isInterstitialLoading = false;
+  static Completer<void>? _adLoadCompleter;
 
   /// Default Google Test Ad Unit IDs
   static const String _testBannerId = 'ca-app-pub-3940256099942544/6300978111';
@@ -26,6 +28,7 @@ class AdService {
     if (kIsWeb) return;
     try {
       await MobileAds.instance.initialize();
+      preloadInterstitialAd();
     } catch (e) {
       debugPrint('AdService initialization warning: $e');
     }
@@ -38,14 +41,16 @@ class AdService {
   }
 
   static Future<void> preloadInterstitialAd() async {
-    if (kIsWeb ||
-        !await shouldShowAds() ||
-        _isInterstitialLoading ||
-        _interstitialAd != null) {
+    if (kIsWeb || !await shouldShowAds() || _interstitialAd != null) {
       return;
+    }
+    if (_isInterstitialLoading) {
+      return _adLoadCompleter?.future;
     }
 
     _isInterstitialLoading = true;
+    _adLoadCompleter = Completer<void>();
+
     try {
       await InterstitialAd.load(
         adUnitId: interstitialAdUnitId,
@@ -54,17 +59,28 @@ class AdService {
           onAdLoaded: (ad) {
             _interstitialAd = ad;
             _isInterstitialLoading = false;
+            if (!(_adLoadCompleter?.isCompleted ?? true)) {
+              _adLoadCompleter?.complete();
+            }
           },
           onAdFailedToLoad: (error) {
             _interstitialAd = null;
             _isInterstitialLoading = false;
+            if (!(_adLoadCompleter?.isCompleted ?? true)) {
+              _adLoadCompleter?.complete();
+            }
           },
         ),
       );
     } catch (e) {
       _isInterstitialLoading = false;
+      if (!(_adLoadCompleter?.isCompleted ?? true)) {
+        _adLoadCompleter?.complete();
+      }
       debugPrint('AdService preload warning: $e');
     }
+
+    return _adLoadCompleter?.future;
   }
 
   static Future<void> showInterstitialAd() async {
@@ -76,20 +92,21 @@ class AdService {
 
     if (_interstitialAd != null) {
       try {
-        _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+        final adToShow = _interstitialAd!;
+        _interstitialAd = null;
+
+        adToShow.fullScreenContentCallback = FullScreenContentCallback(
           onAdDismissedFullScreenContent: (ad) {
             ad.dispose();
-            _interstitialAd = null;
             preloadInterstitialAd();
           },
           onAdFailedToShowFullScreenContent: (ad, error) {
             ad.dispose();
-            _interstitialAd = null;
             preloadInterstitialAd();
           },
         );
 
-        await _interstitialAd!.show();
+        await adToShow.show();
       } catch (e) {
         debugPrint('AdService show warning: $e');
       }

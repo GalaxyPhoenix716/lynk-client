@@ -40,6 +40,7 @@ class MockReceiverRemoteDataSource implements ReceiverRemoteDataSource {
   Future<void> attachTransfer({
     required String sessionId,
     required String transferId,
+    String? aesKey,
   }) async {
     if (shouldThrowDioException) {
       throw DioException(requestOptions: RequestOptions(path: '/attach'));

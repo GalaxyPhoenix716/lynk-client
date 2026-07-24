@@ -55,7 +55,8 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
 
     ref.listen<ReceiverState>(receiverProvider, (previous, next) {
       if (next.attachedTransferId != null) {
-        context.go('/download-progress/${next.attachedTransferId}');
+        final key = next.attachedAesKey ?? '';
+        context.go('/download-progress/${next.attachedTransferId}?aesKey=$key');
       }
     });
 

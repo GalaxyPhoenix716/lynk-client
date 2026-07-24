@@ -9,12 +9,14 @@ class ReceiverState {
   final ReceiverSession? session;
   final bool isPolling;
   final String? attachedTransferId;
+  final String? attachedAesKey;
   final String? errorMessage;
 
   const ReceiverState({
     this.session,
     this.isPolling = false,
     this.attachedTransferId,
+    this.attachedAesKey,
     this.errorMessage,
   });
 
@@ -22,12 +24,14 @@ class ReceiverState {
     ReceiverSession? session,
     bool? isPolling,
     String? attachedTransferId,
+    String? attachedAesKey,
     String? errorMessage,
   }) {
     return ReceiverState(
       session: session ?? this.session,
       isPolling: isPolling ?? this.isPolling,
       attachedTransferId: attachedTransferId ?? this.attachedTransferId,
+      attachedAesKey: attachedAesKey ?? this.attachedAesKey,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -69,6 +73,7 @@ class ReceiverNotifier extends _$ReceiverNotifier {
           state = state.copyWith(
             isPolling: false,
             attachedTransferId: session.transferId,
+            attachedAesKey: session.aesKey,
           );
         }
       }, (_) {});

@@ -47,7 +47,8 @@ GoRouter appRouter(Ref ref) {
         path: '/send-qr',
         builder: (context, state) {
           final transfer = state.extra as Transfer;
-          return SendQrScreen(transfer: transfer);
+          final aesKey = state.uri.queryParameters['aesKey'] ?? '';
+          return SendQrScreen(transfer: transfer, aesKey: aesKey);
         },
       ),
       GoRoute(

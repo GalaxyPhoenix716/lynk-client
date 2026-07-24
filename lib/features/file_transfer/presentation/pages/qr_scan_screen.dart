@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../../../core/providers/receiver_providers.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../providers/upload_notifier.dart';
 
 class QrScanScreen extends ConsumerStatefulWidget {
   final String? attachTransferId;
@@ -72,9 +73,11 @@ class _QrScanScreenState extends ConsumerState<QrScanScreen> {
     if (widget.attachTransferId != null &&
         widget.attachTransferId!.isNotEmpty) {
       final repo = ref.read(receiverRepositoryProvider);
+      final currentAesKey = ref.read(uploadProvider).aesKey;
       final result = await repo.attachTransfer(
         sessionId: sessionId,
         transferId: widget.attachTransferId!,
+        aesKey: currentAesKey,
       );
 
       if (mounted) {

@@ -7,6 +7,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'decrypt_file_use_case.g.dart';
 
 class DecryptFileUseCase {
+  static String _sanitizeKey(String key) {
+    final clean = key.trim();
+    if (clean.length == 32) return clean;
+    if (clean.length > 32) return clean.substring(0, 32);
+    return clean.padRight(32, '0');
+  }
+
   /// Decrypts an encrypted file using AES-256-CBC and returns the decrypted file.
   /// The first 16 bytes are extracted as the IV, and the rest is decrypted.
   /// Execution is offloaded to a background Dart Isolate to ensure UI smoothness.
@@ -16,6 +23,7 @@ class DecryptFileUseCase {
     required String outputPath,
   }) async {
     final encPath = encryptedFile.path;
+    final keyStr = _sanitizeKey(aesKey32Bytes);
 
     await Isolate.run(() async {
       final encryptedBytes = await File(encPath).readAsBytes();
@@ -28,7 +36,7 @@ class DecryptFileUseCase {
       final ivBytes = encryptedBytes.sublist(0, 16);
       final ciphertext = encryptedBytes.sublist(16);
 
-      final key = enc.Key.fromUtf8(aesKey32Bytes);
+      final key = enc.Key.fromUtf8(keyStr);
       final iv = enc.IV(ivBytes);
 
       final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.cbc));
@@ -54,10 +62,11 @@ class DecryptFileUseCase {
       );
     }
 
+    final keyStr = _sanitizeKey(aesKey32Bytes);
     final ivBytes = encryptedBytes.sublist(0, 16);
     final ciphertext = encryptedBytes.sublist(16);
 
-    final key = enc.Key.fromUtf8(aesKey32Bytes);
+    final key = enc.Key.fromUtf8(keyStr);
     final iv = enc.IV(ivBytes);
 
     final encrypter = enc.Encrypter(enc.AES(key, mode: enc.AESMode.cbc));

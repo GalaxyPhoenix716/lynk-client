@@ -28,6 +28,7 @@ class _DownloadProgressScreenState
   @override
   void initState() {
     super.initState();
+    AdService.preloadInterstitialAd();
     Future.microtask(
       () => ref
           .read(downloadProvider.notifier)
