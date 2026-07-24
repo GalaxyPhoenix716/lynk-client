@@ -17,7 +17,7 @@ part 'upload_notifier.g.dart';
 @riverpod
 UploadService uploadService(Ref ref) => UploadService();
 
-@riverpod
+@Riverpod(keepAlive: true)
 class UploadNotifier extends _$UploadNotifier {
   CancelToken? _cancelToken;
 
@@ -200,11 +200,16 @@ class UploadNotifier extends _$UploadNotifier {
     );
   }
 
+  void reset() {
+    _cancelToken?.cancel();
+    state = const UploadState();
+  }
+
   void cancelUpload() {
     _cancelToken?.cancel();
     if (state.transfer != null) {
       ref.read(transferRepositoryProvider).cancelTransfer(state.transfer!.id);
     }
-    state = state.copyWith(phase: UploadPhase.cancelled);
+    state = const UploadState(phase: UploadPhase.cancelled);
   }
 }

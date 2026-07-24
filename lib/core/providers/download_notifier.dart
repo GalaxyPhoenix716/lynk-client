@@ -14,7 +14,7 @@ part 'download_notifier.g.dart';
 @riverpod
 DownloadService downloadService(Ref ref) => DownloadService();
 
-@riverpod
+@Riverpod(keepAlive: true)
 class DownloadNotifier extends _$DownloadNotifier {
   CancelToken? _cancelToken;
 

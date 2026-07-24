@@ -13,6 +13,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/file_size_formatter.dart';
 import '../../../../core/widgets/ad_banner_widget.dart';
 import '../../domain/entities/transfer.dart';
+import '../providers/upload_notifier.dart';
 
 class SendQrScreen extends ConsumerStatefulWidget {
   final Transfer transfer;
@@ -49,6 +50,7 @@ class _SendQrScreenState extends ConsumerState<SendQrScreen> {
   Future<void> _cancelSessionAndGoHome() async {
     _timer?.cancel();
     ref.read(transferRepositoryProvider).cancelTransfer(widget.transfer.id);
+    ref.read(uploadProvider.notifier).reset();
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -75,6 +77,7 @@ class _SendQrScreenState extends ConsumerState<SendQrScreen> {
       final file = File('${tempDir.path}/lynk_qr.png');
       await file.writeAsBytes(pngBytes);
 
+      // ignore: deprecated_member_use
       await Share.shareXFiles([
         XFile(file.path),
       ], text: 'Scan this QR code with Lynk App to download files.');

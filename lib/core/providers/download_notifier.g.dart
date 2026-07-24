@@ -62,7 +62,7 @@ final class DownloadNotifierProvider
         argument: null,
         retry: null,
         name: r'downloadProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -83,7 +83,7 @@ final class DownloadNotifierProvider
   }
 }
 
-String _$downloadNotifierHash() => r'f4839a89bd50267fcf38b6cb35ffe864c07c2cc6';
+String _$downloadNotifierHash() => r'732a46d44c9b7cbec30a4503f38fb8278273c8fa';
 
 abstract class _$DownloadNotifier extends $Notifier<DownloadState> {
   DownloadState build();

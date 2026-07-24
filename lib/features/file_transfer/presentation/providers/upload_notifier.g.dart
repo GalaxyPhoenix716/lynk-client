@@ -61,7 +61,7 @@ final class UploadNotifierProvider
         argument: null,
         retry: null,
         name: r'uploadProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -82,7 +82,7 @@ final class UploadNotifierProvider
   }
 }
 
-String _$uploadNotifierHash() => r'e843424b7708f82f301a934a8aba0d7b7e30bdf1';
+String _$uploadNotifierHash() => r'd5be240556c22c46850c26398997ab8c437ded91';
 
 abstract class _$UploadNotifier extends $Notifier<UploadState> {
   UploadState build();
