@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.client"
+    namespace = "com.lynk.client"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
