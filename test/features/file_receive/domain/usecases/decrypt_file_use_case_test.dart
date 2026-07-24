@@ -48,16 +48,19 @@ void main() {
       },
     );
 
-    test('execute automatically sanitizes and handles keys with whitespace or non-32 lengths', () async {
-      final paddedKey = '  $aesKey  ';
-      final result = await decryptUseCase.execute(
-        encryptedFile: encryptedFile,
-        aesKey32Bytes: paddedKey,
-        outputPath: decryptedFile.path,
-      );
+    test(
+      'execute automatically sanitizes and handles keys with whitespace or non-32 lengths',
+      () async {
+        final paddedKey = '  $aesKey  ';
+        final result = await decryptUseCase.execute(
+          encryptedFile: encryptedFile,
+          aesKey32Bytes: paddedKey,
+          outputPath: decryptedFile.path,
+        );
 
-      expect(result.existsSync(), true);
-      expect(result.readAsStringSync(), testContent);
-    });
+        expect(result.existsSync(), true);
+        expect(result.readAsStringSync(), testContent);
+      },
+    );
   });
 }

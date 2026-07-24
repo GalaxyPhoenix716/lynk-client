@@ -34,5 +34,11 @@ class ReceiverSession extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, status, transferId, aesKey, expiresMultiplier];
+  List<Object?> get props => [
+    id,
+    status,
+    transferId,
+    aesKey,
+    expiresMultiplier,
+  ];
 }

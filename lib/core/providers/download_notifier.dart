@@ -66,7 +66,9 @@ class DownloadNotifier extends _$DownloadNotifier {
         Directory? saveDir;
         if (!kIsWeb) {
           if (Platform.isAndroid) {
-            final lynkPublicDir = Directory('/storage/emulated/0/Download/Lynk');
+            final lynkPublicDir = Directory(
+              '/storage/emulated/0/Download/Lynk',
+            );
             if (!await lynkPublicDir.exists()) {
               await lynkPublicDir.create(recursive: true);
             }
@@ -87,7 +89,9 @@ class DownloadNotifier extends _$DownloadNotifier {
           state = state.copyWith(currentFileIndex: i, currentFileProgress: 0.0);
 
           try {
-            String? key = (aesKey != null && aesKey.isNotEmpty) ? aesKey : state.aesKey;
+            String? key = (aesKey != null && aesKey.isNotEmpty)
+                ? aesKey
+                : state.aesKey;
             if (key == null || key.isEmpty) {
               key = ref.read(receiverProvider).attachedAesKey;
             }
