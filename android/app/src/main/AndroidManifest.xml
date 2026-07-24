@@ -9,7 +9,7 @@
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".MainActivity"
+            android:name="app.lynk.client.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""
@@ -28,7 +28,7 @@
         </activity>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-9472143004063972~5082510676"/>
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
 
         <meta-data
             android:name="flutterEmbedding"

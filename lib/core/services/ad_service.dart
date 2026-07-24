@@ -24,7 +24,11 @@ class AdService {
 
   static Future<void> init() async {
     if (kIsWeb) return;
-    await MobileAds.instance.initialize();
+    try {
+      await MobileAds.instance.initialize();
+    } catch (e) {
+      debugPrint('AdService initialization warning: $e');
+    }
   }
 
   static Future<bool> shouldShowAds() async {
@@ -42,20 +46,25 @@ class AdService {
     }
 
     _isInterstitialLoading = true;
-    await InterstitialAd.load(
-      adUnitId: interstitialAdUnitId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-          _isInterstitialLoading = false;
-        },
-        onAdFailedToLoad: (error) {
-          _interstitialAd = null;
-          _isInterstitialLoading = false;
-        },
-      ),
-    );
+    try {
+      await InterstitialAd.load(
+        adUnitId: interstitialAdUnitId,
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (ad) {
+            _interstitialAd = ad;
+            _isInterstitialLoading = false;
+          },
+          onAdFailedToLoad: (error) {
+            _interstitialAd = null;
+            _isInterstitialLoading = false;
+          },
+        ),
+      );
+    } catch (e) {
+      _isInterstitialLoading = false;
+      debugPrint('AdService preload warning: $e');
+    }
   }
 
   static Future<void> showInterstitialAd() async {
@@ -66,20 +75,24 @@ class AdService {
     }
 
     if (_interstitialAd != null) {
-      _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdDismissedFullScreenContent: (ad) {
-          ad.dispose();
-          _interstitialAd = null;
-          preloadInterstitialAd();
-        },
-        onAdFailedToShowFullScreenContent: (ad, error) {
-          ad.dispose();
-          _interstitialAd = null;
-          preloadInterstitialAd();
-        },
-      );
+      try {
+        _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+          onAdDismissedFullScreenContent: (ad) {
+            ad.dispose();
+            _interstitialAd = null;
+            preloadInterstitialAd();
+          },
+          onAdFailedToShowFullScreenContent: (ad, error) {
+            ad.dispose();
+            _interstitialAd = null;
+            preloadInterstitialAd();
+          },
+        );
 
-      await _interstitialAd!.show();
+        await _interstitialAd!.show();
+      } catch (e) {
+        debugPrint('AdService show warning: $e');
+      }
     }
   }
 }
