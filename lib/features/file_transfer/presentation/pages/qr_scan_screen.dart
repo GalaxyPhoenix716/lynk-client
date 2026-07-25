@@ -1,11 +1,8 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import '../../../../core/providers/receiver_providers.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../providers/upload_notifier.dart';
+import '../helpers/qr_scan_helper.dart';
 
 class QrScanScreen extends ConsumerStatefulWidget {
   final String? attachTransferId;
@@ -18,92 +15,16 @@ class QrScanScreen extends ConsumerStatefulWidget {
 class _QrScanScreenState extends ConsumerState<QrScanScreen> {
   bool _scanned = false;
 
-  void _onDetect(BarcodeCapture capture) {
+  void _onDetect(BarcodeCapture capture) async {
     if (_scanned) return;
-    final rawValue = capture.barcodes.first.rawValue;
-    if (rawValue == null) return;
-
-    // Pattern 1: Clean URL format (https://lynk.app/send/xyz#aesKey or https://lynk.app/receive/abc)
-    final uri = Uri.tryParse(rawValue);
-    if (uri != null &&
-        (uri.scheme == 'https' || uri.scheme == 'http') &&
-        uri.host == 'lynk.app') {
-      final segments = uri.pathSegments;
-      if (segments.length >= 2) {
-        final action = segments[0];
-        final id = segments[1];
-        final aesKey = uri.fragment;
-        if (action == 'send') {
-          _scanned = true;
-          context.go('/download-progress/$id?aesKey=$aesKey');
-          return;
-        } else if (action == 'receive') {
-          _scanned = true;
-          _handleReceiveSession(id);
-          return;
-        }
-      }
-    }
-
-    // Pattern 2: Legacy JSON format fallback
-    try {
-      final json = jsonDecode(rawValue);
-      if (json is Map<String, dynamic>) {
-        if (json.containsKey('transfer_id') && json['transfer_id'] is String) {
-          _scanned = true;
-          final transferId = json['transfer_id'] as String;
-          context.go('/download-progress/$transferId');
-          return;
-        } else if (json.containsKey('session_id') &&
-            json['session_id'] is String) {
-          _scanned = true;
-          final sessionId = json['session_id'] as String;
-          _handleReceiveSession(sessionId);
-          return;
-        }
-      }
-    } catch (_) {
-      // Non-JSON payload
-    }
-
-    // If it's a random non-Lynk QR, do absolutely nothing (ignore silently and keep scanner active)
-  }
-
-  Future<void> _handleReceiveSession(String sessionId) async {
-    if (widget.attachTransferId != null &&
-        widget.attachTransferId!.isNotEmpty) {
-      final repo = ref.read(receiverRepositoryProvider);
-      final currentAesKey = ref.read(uploadProvider).aesKey;
-      final result = await repo.attachTransfer(
-        sessionId: sessionId,
-        transferId: widget.attachTransferId!,
-        aesKey: currentAesKey,
-      );
-
-      if (mounted) {
-        result.fold(
-          (_) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Files successfully sent to receiver!'),
-                backgroundColor: AppTheme.secondary,
-              ),
-            );
-            context.pop();
-          },
-          (failure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Failed to pair: ${failure.message}'),
-                backgroundColor: AppTheme.error,
-              ),
-            );
-            setState(() => _scanned = false);
-          },
-        );
-      }
-    } else {
-      context.go('/upload?attachToSessionId=$sessionId');
+    final success = await QrScanHelper.processBarcodeDetection(
+      context: context,
+      ref: ref,
+      capture: capture,
+      attachTransferId: widget.attachTransferId,
+    );
+    if (success && mounted) {
+      setState(() => _scanned = true);
     }
   }
 

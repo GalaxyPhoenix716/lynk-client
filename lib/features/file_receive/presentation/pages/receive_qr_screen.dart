@@ -6,6 +6,7 @@ import 'package:qr_flutter/qr_flutter.dart';
 import '../../../../core/providers/receiver_notifier.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/ad_banner_widget.dart';
+import '../helpers/receive_qr_helper.dart';
 
 class ReceiveQrScreen extends ConsumerStatefulWidget {
   const ReceiveQrScreen({super.key});
@@ -42,12 +43,6 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
     _timer?.cancel();
     _secondsRemainingNotifier.dispose();
     super.dispose();
-  }
-
-  String _formatTime(int seconds) {
-    final m = seconds ~/ 60;
-    final s = seconds % 60;
-    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -93,7 +88,7 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
                   valueListenable: _secondsRemainingNotifier,
                   builder: (context, seconds, child) {
                     return Text(
-                      'Session expires in ${_formatTime(seconds)}',
+                      'Session expires in ${ReceiveQrHelper.formatTime(seconds)}',
                       style: const TextStyle(
                         color: AppTheme.secondary,
                         fontWeight: FontWeight.bold,
@@ -150,10 +145,8 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
               ],
               const Spacer(),
               OutlinedButton(
-                onPressed: () {
-                  ref.read(receiverProvider.notifier).cancelSession();
-                  context.pop();
-                },
+                onPressed: () =>
+                    ReceiveQrHelper.cancelSessionAndPop(context, ref),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppTheme.error,
                   side: const BorderSide(color: AppTheme.error),

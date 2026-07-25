@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +7,7 @@ import '../../../../core/providers/transfer_providers.dart';
 import '../../../../core/services/ad_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/ad_banner_widget.dart';
+import '../helpers/download_ad_helper.dart';
 
 class DownloadProgressScreen extends ConsumerStatefulWidget {
   final String transferId;
@@ -25,113 +25,16 @@ class DownloadProgressScreen extends ConsumerStatefulWidget {
 
 class _DownloadProgressScreenState
     extends ConsumerState<DownloadProgressScreen> {
-  bool _hasAutoStarted = false;
-
   @override
   void initState() {
     super.initState();
+    DownloadAdHelper.resetState();
     AdService.preloadInterstitialAd();
     Future.microtask(
       () => ref
           .read(downloadProvider.notifier)
           .loadTransferPreview(widget.transferId),
     );
-  }
-
-  void _triggerAutomaticDownloadAndAd(BuildContext context) {
-    if (_hasAutoStarted) return;
-    _hasAutoStarted = true;
-
-    final notifier = ref.read(downloadProvider.notifier);
-    // 1. Immediately start background download stream (0ms delay)
-    notifier.startDownload(aesKey: widget.aesKey);
-
-    // 2. Display automatic 3-second countdown dialog without any buttons
-    final countdownNotifier = ValueNotifier<int>(3);
-    Timer? countdownTimer;
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-          if (countdownNotifier.value > 1) {
-            countdownNotifier.value--;
-          } else {
-            timer.cancel();
-            if (Navigator.canPop(dialogContext)) {
-              Navigator.pop(dialogContext);
-            }
-            // 3. Automatically launch Interstitial Ad after 3-second countdown
-            AdService.showInterstitialAd();
-          }
-        });
-
-        return PopScope(
-          canPop: false,
-          child: AlertDialog(
-            backgroundColor: AppTheme.cardBg,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 12),
-                const Icon(
-                  Icons.cloud_download_outlined,
-                  size: 56,
-                  color: AppTheme.primary,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Downloading Files...',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Your download has started in the background! A quick ad will begin shortly.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
-                ),
-                const SizedBox(height: 20),
-                ValueListenableBuilder<int>(
-                  valueListenable: countdownNotifier,
-                  builder: (context, seconds, child) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primary.withAlpha(30),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        'Ad starts in ${seconds}s',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.primary,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 12),
-              ],
-            ),
-          ),
-        );
-      },
-    ).then((_) {
-      countdownTimer?.cancel();
-      countdownNotifier.dispose();
-    });
   }
 
   @override
@@ -141,7 +44,11 @@ class _DownloadProgressScreenState
 
     ref.listen<DownloadState>(downloadProvider, (previous, next) {
       if (next.phase == DownloadPhase.preview && next.transfer != null) {
-        _triggerAutomaticDownloadAndAd(context);
+        DownloadAdHelper.triggerAutomaticDownloadAndAd(
+          context: context,
+          ref: ref,
+          aesKey: widget.aesKey,
+        );
       }
     });
 
@@ -164,8 +71,7 @@ class _DownloadProgressScreenState
             child: Column(
               children: [
                 if (state.phase == DownloadPhase.idle ||
-                    (state.phase == DownloadPhase.preview &&
-                        !_hasAutoStarted)) ...[
+                    state.phase == DownloadPhase.preview) ...[
                   const Expanded(
                     child: Center(
                       child: Column(
@@ -178,9 +84,7 @@ class _DownloadProgressScreenState
                       ),
                     ),
                   ),
-                ] else if (state.phase == DownloadPhase.downloading ||
-                    (state.phase == DownloadPhase.preview &&
-                        _hasAutoStarted)) ...[
+                ] else if (state.phase == DownloadPhase.downloading) ...[
                   Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -300,7 +204,7 @@ class _DownloadProgressScreenState
                           const SizedBox(height: 24),
                           ElevatedButton(
                             onPressed: () {
-                              _hasAutoStarted = false;
+                              DownloadAdHelper.resetState();
                               notifier.startDownload(aesKey: widget.aesKey);
                             },
                             child: const Text('Retry Download'),
