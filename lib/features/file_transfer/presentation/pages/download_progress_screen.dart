@@ -57,7 +57,9 @@ class _DownloadProgressScreenState
             onPressed: () {
               Navigator.pop(context);
               notifier.startDownload(aesKey: widget.aesKey);
-              AdService.showInterstitialAd();
+              Future.delayed(const Duration(milliseconds: 250), () {
+                AdService.showInterstitialAd();
+              });
             },
             child: const Text('Continue'),
           ),
