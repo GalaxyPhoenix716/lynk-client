@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:client/features/file_transfer/domain/usecases/encrypt_file_use_case.dart';
 import 'package:client/features/file_receive/domain/usecases/decrypt_file_use_case.dart';
@@ -60,6 +61,41 @@ void main() {
 
         expect(result.existsSync(), true);
         expect(result.readAsStringSync(), testContent);
+      },
+    );
+
+    test(
+      'execute streams and decrypts multi-megabyte large files correctly across 1MB chunk boundaries',
+      () async {
+        final largeFile = File('large_payload_test.bin');
+        final largeBytes = Uint8List(
+          2 * 1024 * 1024 + 500,
+        ); // 2.0005 MB payload
+        for (int i = 0; i < largeBytes.length; i++) {
+          largeBytes[i] = i % 256;
+        }
+        await largeFile.writeAsBytes(largeBytes);
+
+        final encLargeFile = await encryptUseCase.execute(
+          inputFile: largeFile,
+          aesKey32Bytes: aesKey,
+        );
+
+        final decLargeFile = File('decrypted_large_payload.bin');
+        await decryptUseCase.execute(
+          encryptedFile: encLargeFile,
+          aesKey32Bytes: aesKey,
+          outputPath: decLargeFile.path,
+        );
+
+        expect(decLargeFile.existsSync(), true);
+        expect(decLargeFile.lengthSync(), largeBytes.length);
+        final decBytes = await decLargeFile.readAsBytes();
+        expect(decBytes, largeBytes);
+
+        if (largeFile.existsSync()) await largeFile.delete();
+        if (encLargeFile.existsSync()) await encLargeFile.delete();
+        if (decLargeFile.existsSync()) await decLargeFile.delete();
       },
     );
   });
