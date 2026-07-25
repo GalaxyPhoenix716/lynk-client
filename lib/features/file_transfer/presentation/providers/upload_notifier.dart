@@ -107,7 +107,16 @@ class UploadNotifier extends _$UploadNotifier {
 
     createResult.fold(
       (transfer) async {
-        state = state.copyWith(transfer: transfer);
+        final effectiveTotalSize = transfer.totalSize > 0
+            ? transfer.totalSize
+            : state.totalSize;
+        final updatedTransfer = transfer.copyWith(
+          totalSize: effectiveTotalSize,
+          totalFiles: transfer.totalFiles > 0
+              ? transfer.totalFiles
+              : state.selectedFiles.length,
+        );
+        state = state.copyWith(transfer: updatedTransfer);
         int cumulativeBytes = 0;
 
         for (int i = 0; i < state.selectedFiles.length; i++) {

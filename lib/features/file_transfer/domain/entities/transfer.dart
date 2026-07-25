@@ -9,6 +9,7 @@ class Transfer extends Equatable {
   final int totalFiles;
   final int totalSize;
   final int? expiresMultiplier;
+  final DateTime? createdAt;
   final List<FileItem> files;
 
   const Transfer({
@@ -17,6 +18,7 @@ class Transfer extends Equatable {
     required this.totalFiles,
     required this.totalSize,
     this.expiresMultiplier,
+    this.createdAt,
     required this.files,
   });
 
@@ -26,6 +28,7 @@ class Transfer extends Equatable {
     int? totalFiles,
     int? totalSize,
     int? expiresMultiplier,
+    DateTime? createdAt,
     List<FileItem>? files,
   }) {
     return Transfer(
@@ -34,6 +37,7 @@ class Transfer extends Equatable {
       totalFiles: totalFiles ?? this.totalFiles,
       totalSize: totalSize ?? this.totalSize,
       expiresMultiplier: expiresMultiplier ?? this.expiresMultiplier,
+      createdAt: createdAt ?? this.createdAt,
       files: files ?? this.files,
     );
   }
@@ -45,6 +49,7 @@ class Transfer extends Equatable {
     totalFiles,
     totalSize,
     expiresMultiplier,
+    createdAt,
     files,
   ];
 }

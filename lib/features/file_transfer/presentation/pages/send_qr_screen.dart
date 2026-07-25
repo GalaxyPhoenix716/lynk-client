@@ -20,13 +20,18 @@ class SendQrScreen extends ConsumerStatefulWidget {
 }
 
 class _SendQrScreenState extends ConsumerState<SendQrScreen> {
-  final ValueNotifier<int> _secondsRemainingNotifier = ValueNotifier<int>(600);
+  late final ValueNotifier<int> _secondsRemainingNotifier;
   Timer? _timer;
   final GlobalKey _qrKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
+    final initialRemaining = SendQrHelper.calculateRemainingSeconds(
+      widget.transfer.createdAt,
+    );
+    _secondsRemainingNotifier = ValueNotifier<int>(initialRemaining);
+
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (_secondsRemainingNotifier.value > 0) {
         _secondsRemainingNotifier.value--;

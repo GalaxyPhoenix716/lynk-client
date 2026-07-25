@@ -25,10 +25,9 @@ class QrShareHelper {
       await file.writeAsBytes(byteData.buffer.asUint8List());
 
       // ignore: deprecated_member_use
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: 'Scan this QR code in Lynk to receive files!',
-      );
+      await Share.shareXFiles([
+        XFile(file.path),
+      ], text: 'Scan this QR code in Lynk to receive files!');
     } catch (e) {
       debugPrint('Error sharing QR code: $e');
     }

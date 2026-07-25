@@ -8,6 +8,7 @@ class TransferModel extends Transfer {
     required super.totalFiles,
     required super.totalSize,
     super.expiresMultiplier,
+    super.createdAt,
     required super.files,
   });
 
@@ -31,13 +32,22 @@ class TransferModel extends Transfer {
         .map((f) => FileItemModel.fromJson(f as Map<String, dynamic>))
         .toList();
 
+    final int computedTotalSize = parsedFiles.fold(0, (sum, f) => sum + f.size);
+    final rawSize = json['total_size'] as int? ?? json['totalSize'] as int?;
+
+    DateTime? parsedCreatedAt;
+    if (json['created_at'] != null && json['created_at'] is String) {
+      parsedCreatedAt = DateTime.tryParse(json['created_at'] as String);
+    }
+
     return TransferModel(
       id: json['transfer_id'] as String? ?? '',
       status: parseStatus(json['status'] as String?),
       totalFiles: json['total_files'] as int? ?? parsedFiles.length,
-      totalSize: json['total_size'] as int? ?? 0,
+      totalSize: (rawSize != null && rawSize > 0) ? rawSize : computedTotalSize,
       expiresMultiplier:
           json['expires_in'] as int? ?? json['expires_at_seconds'] as int?,
+      createdAt: parsedCreatedAt ?? DateTime.now(),
       files: parsedFiles,
     );
   }
@@ -62,6 +72,7 @@ class TransferModel extends Transfer {
       'total_files': totalFiles,
       'total_size': totalSize,
       if (expiresMultiplier != null) 'expires_in': expiresMultiplier,
+      if (createdAt != null) 'created_at': createdAt!.toIso8601String(),
       'files': files.map((f) => FileItemModel.fromEntity(f).toJson()).toList(),
     };
   }
@@ -73,6 +84,7 @@ class TransferModel extends Transfer {
       totalFiles: entity.totalFiles,
       totalSize: entity.totalSize,
       expiresMultiplier: entity.expiresMultiplier,
+      createdAt: entity.createdAt,
       files: entity.files,
     );
   }

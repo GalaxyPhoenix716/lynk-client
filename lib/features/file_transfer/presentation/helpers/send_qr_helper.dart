@@ -17,6 +17,14 @@ class SendQrHelper {
     return 'https://lynk.app/send/$transferId#$key';
   }
 
+  /// Calculates the exact remaining seconds for an active transfer session (total 600s).
+  static int calculateRemainingSeconds(DateTime? createdAt) {
+    if (createdAt == null) return 600;
+    final elapsed = DateTime.now().difference(createdAt).inSeconds;
+    final remaining = 600 - elapsed;
+    return remaining > 0 ? remaining : 0;
+  }
+
   /// Formats seconds into MM:SS format.
   static String formatRemainingTime(int seconds) {
     final m = seconds ~/ 60;
