@@ -39,11 +39,13 @@ class UploadNotifier extends _$UploadNotifier {
     }
 
     final totalSize = files.fold(0, (sum, f) => sum + f.size);
-    if (totalSize > 524288000) {
-      state = state.copyWith(
-        phase: UploadPhase.failed,
-        errorMessage: 'Total transfer limit is 500 MB',
-      );
+    final maxLimit = state.isSizeLimitUnlocked ? 524288000 : 157286400;
+
+    if (totalSize > maxLimit) {
+      final msg = state.isSizeLimitUnlocked
+          ? 'Total transfer limit is 500 MB'
+          : 'Free limit is 150 MB. Watch an ad to unlock up to 500 MB!';
+      state = state.copyWith(phase: UploadPhase.failed, errorMessage: msg);
       return;
     }
 
@@ -57,7 +59,11 @@ class UploadNotifier extends _$UploadNotifier {
       }
     }
 
-    state = UploadState(selectedFiles: files, phase: UploadPhase.selecting);
+    state = state.copyWith(selectedFiles: files, phase: UploadPhase.selecting);
+  }
+
+  void unlockExtendedSizeLimit() {
+    state = state.copyWith(isSizeLimitUnlocked: true);
   }
 
   Future<void> pickMedia() async {

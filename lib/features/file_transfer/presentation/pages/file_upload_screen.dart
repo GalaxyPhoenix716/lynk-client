@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/services/ad_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/file_size_formatter.dart';
 import '../../../../core/widgets/ad_banner_widget.dart';
@@ -33,12 +34,44 @@ class FileUploadScreen extends ConsumerWidget {
         }
       } else if (next.phase == UploadPhase.failed &&
           next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: AppTheme.error,
-          ),
-        );
+        if (next.errorMessage!.contains('Free limit is 150 MB')) {
+          showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              backgroundColor: AppTheme.cardBg,
+              title: const Text('Unlock 500 MB Transfer'),
+              content: const Text(
+                'Free transfer limit is 150 MB. Watch a short ad to unlock up to 500 MB for this session!',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    AdService.showRewardedAd(
+                      onRewardGranted: () {
+                        notifier.unlockExtendedSizeLimit();
+                        notifier.pickFiles();
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.card_giftcard),
+                  label: const Text('Watch Ad & Unlock 500 MB'),
+                ),
+              ],
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(next.errorMessage!),
+              backgroundColor: AppTheme.error,
+            ),
+          );
+        }
       }
     });
 

@@ -14,6 +14,7 @@ class UploadState extends Equatable {
   final int bytesUploaded;
   final UploadPhase phase;
   final String? errorMessage;
+  final bool isSizeLimitUnlocked;
 
   const UploadState({
     this.selectedFiles = const [],
@@ -25,6 +26,7 @@ class UploadState extends Equatable {
     this.bytesUploaded = 0,
     this.phase = UploadPhase.idle,
     this.errorMessage,
+    this.isSizeLimitUnlocked = false,
   });
 
   int get totalSize =>
@@ -40,6 +42,7 @@ class UploadState extends Equatable {
     int? bytesUploaded,
     UploadPhase? phase,
     String? errorMessage,
+    bool? isSizeLimitUnlocked,
   }) {
     return UploadState(
       selectedFiles: selectedFiles ?? this.selectedFiles,
@@ -51,6 +54,7 @@ class UploadState extends Equatable {
       bytesUploaded: bytesUploaded ?? this.bytesUploaded,
       phase: phase ?? this.phase,
       errorMessage: errorMessage ?? this.errorMessage,
+      isSizeLimitUnlocked: isSizeLimitUnlocked ?? this.isSizeLimitUnlocked,
     );
   }
 
@@ -65,5 +69,6 @@ class UploadState extends Equatable {
     bytesUploaded,
     phase,
     errorMessage,
+    isSizeLimitUnlocked,
   ];
 }

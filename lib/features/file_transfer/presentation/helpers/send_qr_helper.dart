@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/providers/transfer_providers.dart';
+import '../../../../core/services/ad_service.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../providers/upload_notifier.dart';
 
 class SendQrHelper {
@@ -17,11 +19,14 @@ class SendQrHelper {
     return 'https://lynk.app/send/$transferId#$key';
   }
 
-  /// Calculates the exact remaining seconds for an active transfer session (total 600s).
-  static int calculateRemainingSeconds(DateTime? createdAt) {
-    if (createdAt == null) return 600;
+  /// Calculates the exact remaining seconds for an active transfer session (default 600s).
+  static int calculateRemainingSeconds(
+    DateTime? createdAt, {
+    int totalLifetimeSeconds = 600,
+  }) {
+    if (createdAt == null) return totalLifetimeSeconds;
     final elapsed = DateTime.now().difference(createdAt).inSeconds;
-    final remaining = 600 - elapsed;
+    final remaining = totalLifetimeSeconds - elapsed;
     return remaining > 0 ? remaining : 0;
   }
 
@@ -30,6 +35,26 @@ class SendQrHelper {
     final m = seconds ~/ 60;
     final s = seconds % 60;
     return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
+  }
+
+  /// Extends the session time to 30 minutes (1800s) after watching a Rewarded Ad.
+  static Future<void> extendSessionTimeWithAd({
+    required BuildContext context,
+    required ValueNotifier<int> secondsNotifier,
+  }) async {
+    await AdService.showRewardedAd(
+      onRewardGranted: () {
+        secondsNotifier.value = 1800; // 30 minutes
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Session extended to 30 minutes!'),
+              backgroundColor: AppTheme.secondary,
+            ),
+          );
+        }
+      },
+    );
   }
 
   /// Cancels transfer session and navigates home.

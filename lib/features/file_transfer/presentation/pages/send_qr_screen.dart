@@ -102,12 +102,38 @@ class _SendQrScreenState extends ConsumerState<SendQrScreen> {
                 ValueListenableBuilder<int>(
                   valueListenable: _secondsRemainingNotifier,
                   builder: (context, seconds, child) {
-                    return Text(
-                      'Expires in ${SendQrHelper.formatRemainingTime(seconds)}',
-                      style: const TextStyle(
-                        color: AppTheme.secondary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    return Column(
+                      children: [
+                        Text(
+                          'Expires in ${SendQrHelper.formatRemainingTime(seconds)}',
+                          style: const TextStyle(
+                            color: AppTheme.secondary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        if (seconds < 1500) ...[
+                          const SizedBox(height: 4),
+                          TextButton.icon(
+                            onPressed: () =>
+                                SendQrHelper.extendSessionTimeWithAd(
+                                  context: context,
+                                  secondsNotifier: _secondsRemainingNotifier,
+                                ),
+                            icon: const Icon(
+                              Icons.timer_outlined,
+                              size: 16,
+                              color: AppTheme.primary,
+                            ),
+                            label: const Text(
+                              'Extend Session to 30 Mins (Watch Ad)',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: AppTheme.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     );
                   },
                 ),
