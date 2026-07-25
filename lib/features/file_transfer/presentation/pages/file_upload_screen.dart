@@ -66,9 +66,16 @@ class FileUploadScreen extends ConsumerWidget {
                           style: TextStyle(color: AppTheme.textSecondary),
                         ),
                         const SizedBox(height: 24),
-                        ElevatedButton(
+                        ElevatedButton.icon(
+                          onPressed: () => notifier.pickMedia(),
+                          icon: const Icon(Icons.photo_library),
+                          label: const Text('Photos & Videos'),
+                        ),
+                        const SizedBox(height: 12),
+                        OutlinedButton.icon(
                           onPressed: () => notifier.pickFiles(),
-                          child: const Text('Choose Files'),
+                          icon: const Icon(Icons.folder_open),
+                          label: const Text('Files & Documents'),
                         ),
                       ],
                     ),

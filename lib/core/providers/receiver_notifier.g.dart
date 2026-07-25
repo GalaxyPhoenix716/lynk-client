@@ -41,7 +41,7 @@ final class ReceiverNotifierProvider
   }
 }
 
-String _$receiverNotifierHash() => r'709896145cbd69a97e7f1701a1dee6a150e4d9b4';
+String _$receiverNotifierHash() => r'f7891475699f5b2c9b5778c5276d5782652e14b6';
 
 abstract class _$ReceiverNotifier extends $Notifier<ReceiverState> {
   ReceiverState build();

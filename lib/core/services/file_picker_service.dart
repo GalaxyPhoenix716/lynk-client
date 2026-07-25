@@ -5,12 +5,24 @@ part 'file_picker_service.g.dart';
 
 abstract class FilePickerService {
   Future<FilePickerResult?> pickFiles({bool allowMultiple = true});
+  Future<FilePickerResult?> pickMedia({bool allowMultiple = true});
 }
 
 class FilePickerServiceImpl implements FilePickerService {
   @override
   Future<FilePickerResult?> pickFiles({bool allowMultiple = true}) async {
-    return FilePicker.platform.pickFiles(allowMultiple: allowMultiple);
+    return FilePicker.platform.pickFiles(
+      allowMultiple: allowMultiple,
+      type: FileType.any,
+    );
+  }
+
+  @override
+  Future<FilePickerResult?> pickMedia({bool allowMultiple = true}) async {
+    return FilePicker.platform.pickFiles(
+      allowMultiple: allowMultiple,
+      type: FileType.media,
+    );
   }
 }
 

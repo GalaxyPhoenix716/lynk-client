@@ -60,6 +60,42 @@ class UploadNotifier extends _$UploadNotifier {
     state = UploadState(selectedFiles: files, phase: UploadPhase.selecting);
   }
 
+  Future<void> pickMedia() async {
+    final picker = ref.read(filePickerServiceProvider);
+    final result = await picker.pickMedia(allowMultiple: true);
+    if (result == null || result.files.isEmpty) return;
+
+    final files = result.files;
+    if (files.length > 10) {
+      state = state.copyWith(
+        phase: UploadPhase.failed,
+        errorMessage: 'Maximum 10 files per transfer',
+      );
+      return;
+    }
+
+    final totalSize = files.fold(0, (sum, f) => sum + f.size);
+    if (totalSize > 524288000) {
+      state = state.copyWith(
+        phase: UploadPhase.failed,
+        errorMessage: 'Total transfer limit is 500 MB',
+      );
+      return;
+    }
+
+    for (var f in files) {
+      if (f.size > 52428800) {
+        state = state.copyWith(
+          phase: UploadPhase.failed,
+          errorMessage: 'File "${f.name}" exceeds 50 MB limit',
+        );
+        return;
+      }
+    }
+
+    state = UploadState(selectedFiles: files, phase: UploadPhase.selecting);
+  }
+
   void setFilesForTesting(List<PlatformFile> files) {
     state = UploadState(selectedFiles: files, phase: UploadPhase.selecting);
   }

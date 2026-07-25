@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/providers/download_notifier.dart';
 import '../../../../core/providers/download_state.dart';
 import '../../../../core/services/config_service.dart';
+import '../../../../core/utils/permission_helper.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/ad_banner_widget.dart';
 import '../../../../features/file_transfer/presentation/providers/upload_notifier.dart';
@@ -18,6 +19,14 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _tapCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      PermissionHelper.requestAllPermissions();
+    });
+  }
 
   void _onVersionTap() {
     _tapCount++;

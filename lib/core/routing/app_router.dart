@@ -9,6 +9,7 @@ import '../../features/file_transfer/presentation/pages/send_qr_screen.dart';
 import '../../features/home/presentation/pages/home_screen.dart';
 import '../../features/onboarding/presentation/pages/onboarding_screen.dart';
 import '../../features/onboarding/presentation/providers/onboarding_provider.dart';
+import '../widgets/not_found_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -18,6 +19,8 @@ GoRouter appRouter(Ref ref) {
 
   return GoRouter(
     initialLocation: hasOnboarded ? '/home' : '/onboarding',
+    errorBuilder: (context, state) =>
+        NotFoundScreen(path: state.uri.toString()),
     redirect: (context, state) {
       final isOnboardingRoute = state.matchedLocation == '/onboarding';
 
