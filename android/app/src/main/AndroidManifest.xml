@@ -25,6 +25,33 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
+            <!-- Sender QR Deep Link Intent Filter for https://lynk.app/send/* and http://lynk.app/send/* -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                
+                <data
+                    android:scheme="https"
+                    android:host="lynk.app"
+                    android:pathPrefix="/send/" />
+                <data
+                    android:scheme="http"
+                    android:host="lynk.app"
+                    android:pathPrefix="/send/" />
+            </intent-filter>
+
+            <!-- Offline Custom Scheme Deep Link Intent Filter for lynk://send/* -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                
+                <data
+                    android:scheme="lynk"
+                    android:host="send" />
+            </intent-filter>
         </activity>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

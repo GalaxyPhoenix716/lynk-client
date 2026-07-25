@@ -71,6 +71,17 @@ GoRouter appRouter(Ref ref) {
           return DownloadProgressScreen(transferId: transferId, aesKey: aesKey);
         },
       ),
+      // Deep Link handler for Sender QR codes (e.g. https://lynk.app/send/:transferId#aesKey)
+      GoRoute(
+        path: '/send/:transferId',
+        builder: (context, state) {
+          final transferId = state.pathParameters['transferId'] ?? '';
+          final aesKey = state.uri.fragment.isNotEmpty
+              ? state.uri.fragment
+              : (state.uri.queryParameters['aesKey'] ?? '');
+          return DownloadProgressScreen(transferId: transferId, aesKey: aesKey);
+        },
+      ),
     ],
   );
 }
