@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/file_size_formatter.dart';
@@ -51,20 +52,18 @@ class _SendQrScreenState extends ConsumerState<SendQrScreen> {
     );
 
     return PopScope(
-      canPop: true,
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
-        // Safe back navigation
+        if (!didPop) {
+          context.go('/home');
+        }
       },
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Share Transfer'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
-            onPressed: () => SendQrHelper.cancelSessionAndGoHome(
-              context: context,
-              ref: ref,
-              transferId: widget.transfer.id,
-            ),
+            onPressed: () => context.go('/home'),
           ),
         ),
         body: SafeArea(
@@ -91,7 +90,7 @@ class _SendQrScreenState extends ConsumerState<SendQrScreen> {
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  'Scan with Receiver Device',
+                  'Scan with Lynk App to Download',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
@@ -99,7 +98,7 @@ class _SendQrScreenState extends ConsumerState<SendQrScreen> {
                   valueListenable: _secondsRemainingNotifier,
                   builder: (context, seconds, child) {
                     return Text(
-                      'Session expires in ${SendQrHelper.formatRemainingTime(seconds)}',
+                      'Expires in ${SendQrHelper.formatRemainingTime(seconds)}',
                       style: const TextStyle(
                         color: AppTheme.secondary,
                         fontWeight: FontWeight.bold,
@@ -109,33 +108,39 @@ class _SendQrScreenState extends ConsumerState<SendQrScreen> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '${widget.transfer.totalFiles} File(s) • ${FileSizeFormatter.format(widget.transfer.totalSize)}',
+                  '${widget.transfer.totalFiles} files · ${FileSizeFormatter.format(widget.transfer.totalSize)}',
                   style: const TextStyle(color: AppTheme.textSecondary),
                 ),
                 const Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: () => QrShareHelper.captureAndShareQr(
-                        qrKey: _qrKey,
-                        transferId: widget.transfer.id,
-                      ),
-                      icon: const Icon(Icons.share),
-                      label: const Text('Share QR'),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => SendQrHelper.cancelSessionAndGoHome(
-                        context: context,
-                        ref: ref,
-                        transferId: widget.transfer.id,
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.error,
-                      ),
-                      child: const Text('Cancel Session'),
-                    ),
-                  ],
+                OutlinedButton.icon(
+                  onPressed: () {
+                    context.push(
+                      '/scan-qr?attachTransferId=${widget.transfer.id}',
+                    );
+                  },
+                  icon: const Icon(Icons.qr_code_scanner),
+                  label: const Text("Scan Receiver's Code"),
+                ),
+                const SizedBox(height: 10),
+                OutlinedButton.icon(
+                  onPressed: () => QrShareHelper.captureAndShareQr(
+                    qrKey: _qrKey,
+                    transferId: widget.transfer.id,
+                  ),
+                  icon: const Icon(Icons.share),
+                  label: const Text('Share QR Image'),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton(
+                  onPressed: () => SendQrHelper.cancelSessionAndGoHome(
+                    context: context,
+                    ref: ref,
+                    transferId: widget.transfer.id,
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.error,
+                  ),
+                  child: const Text('Cancel Session'),
                 ),
                 const SizedBox(height: 16),
                 const AdBannerWidget(),
