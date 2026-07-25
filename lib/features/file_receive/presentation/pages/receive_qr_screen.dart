@@ -15,7 +15,7 @@ class ReceiveQrScreen extends ConsumerStatefulWidget {
 }
 
 class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
-  int _secondsRemaining = 600;
+  final ValueNotifier<int> _secondsRemainingNotifier = ValueNotifier<int>(600);
   Timer? _timer;
 
   @override
@@ -27,10 +27,10 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
 
   void _startTimer() {
     _timer?.cancel();
-    _secondsRemaining = 600;
+    _secondsRemainingNotifier.value = 600;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (_secondsRemaining > 0) {
-        if (mounted) setState(() => _secondsRemaining--);
+      if (_secondsRemainingNotifier.value > 0) {
+        _secondsRemainingNotifier.value--;
       } else {
         _timer?.cancel();
       }
@@ -40,12 +40,13 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
   @override
   void dispose() {
     _timer?.cancel();
+    _secondsRemainingNotifier.dispose();
     super.dispose();
   }
 
-  String get _formattedTime {
-    final m = _secondsRemaining ~/ 60;
-    final s = _secondsRemaining % 60;
+  String _formatTime(int seconds) {
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
     return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
@@ -88,12 +89,17 @@ class _ReceiveQrScreenState extends ConsumerState<ReceiveQrScreen> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  'Session expires in $_formattedTime',
-                  style: const TextStyle(
-                    color: AppTheme.secondary,
-                    fontWeight: FontWeight.bold,
-                  ),
+                ValueListenableBuilder<int>(
+                  valueListenable: _secondsRemainingNotifier,
+                  builder: (context, seconds, child) {
+                    return Text(
+                      'Session expires in ${_formatTime(seconds)}',
+                      style: const TextStyle(
+                        color: AppTheme.secondary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(height: 16),
                 const Row(
