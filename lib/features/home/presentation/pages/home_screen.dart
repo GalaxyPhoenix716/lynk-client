@@ -9,6 +9,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/ad_banner_widget.dart';
 import '../../../../features/file_transfer/presentation/providers/upload_notifier.dart';
 import '../../../../features/file_transfer/presentation/providers/upload_state.dart';
+import 'package:client/features/recent_transfers/presentation/widgets/recent_transfers_widget.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -81,7 +82,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,15 +121,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Active Transfer Available',
+                                'Active Transfer Session',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: AppTheme.secondary,
                                 ),
                               ),
-                              SizedBox(height: 2),
                               Text(
-                                'Tap to view QR code or scan receivers',
+                                'Tap to show QR code again',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: AppTheme.textSecondary,
@@ -139,7 +139,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         ),
                         const Icon(
                           Icons.arrow_forward_ios,
-                          size: 16,
+                          size: 14,
                           color: AppTheme.secondary,
                         ),
                       ],
@@ -148,31 +148,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
               ],
-              Expanded(
-                child: Column(
-                  children: [
-                    _ActionCard(
-                      icon: Icons.upload_file,
-                      title: 'Send Files',
-                      subtitle: 'Upload and share files via QR or direct link',
-                      onTap: () => context.push('/upload'),
-                    ),
-                    const SizedBox(height: 16),
-                    _ActionCard(
-                      icon: Icons.qr_code_scanner,
-                      title: 'Scan QR Code',
-                      subtitle: 'Scan a sender or receiver QR code',
-                      onTap: () => context.push('/scan-qr'),
-                    ),
-                    const SizedBox(height: 16),
-                    _ActionCard(
-                      icon: Icons.qr_code_2,
-                      title: 'Receive Files',
-                      subtitle: 'Generate a receive session QR code',
-                      onTap: () => context.push('/receive-qr'),
-                    ),
-                  ],
-                ),
+              _ActionCard(
+                icon: Icons.upload_file,
+                title: 'Send Files',
+                subtitle: 'Upload and share files via QR or direct link',
+                onTap: () => context.push('/upload'),
+              ),
+              const SizedBox(height: 16),
+              _ActionCard(
+                icon: Icons.qr_code_scanner,
+                title: 'Scan QR Code',
+                subtitle: 'Scan a sender or receiver QR code',
+                onTap: () => context.push('/scan-qr'),
+              ),
+              const SizedBox(height: 16),
+              _ActionCard(
+                icon: Icons.qr_code_2,
+                title: 'Receive Files',
+                subtitle: 'Generate a receive session QR code',
+                onTap: () => context.push('/receive-qr'),
               ),
               if (downloadState.phase == DownloadPhase.downloading) ...[
                 const SizedBox(height: 12),
@@ -229,6 +223,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
               ],
+              const SizedBox(height: 24),
+              const RecentTransfersWidget(),
+              const SizedBox(height: 24),
               Center(
                 child: GestureDetector(
                   onTap: _onVersionTap,

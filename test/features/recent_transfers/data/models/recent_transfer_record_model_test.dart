@@ -37,7 +37,10 @@ void main() {
       expect(model.timestamp, equals(testTimestamp));
       expect(model.status, equals('completed'));
       expect(model.aesKey, equals('aesKey123'));
-      expect(model.filePaths, equals(['/path/to/file1.png', '/path/to/file2.pdf']));
+      expect(
+        model.filePaths,
+        equals(['/path/to/file1.png', '/path/to/file2.pdf']),
+      );
     });
 
     test('toJson serializes RecentTransferRecordModel correctly', () {

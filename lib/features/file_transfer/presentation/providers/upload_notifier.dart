@@ -1,15 +1,19 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:client/core/providers/transfer_providers.dart';
-import 'package:client/core/services/file_picker_service.dart';
 import 'package:client/core/services/upload_service.dart';
 import 'package:client/core/providers/receiver_providers.dart';
 import 'package:client/core/utils/entropy_generator.dart';
 import 'package:client/features/file_transfer/domain/entities/file_item.dart';
 import 'package:client/features/file_transfer/domain/usecases/encrypt_file_use_case.dart';
-import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import '../../../../core/services/file_picker_service.dart';
+import '../../../recent_transfers/data/models/recent_transfer_record_model.dart';
+import '../../../recent_transfers/domain/entities/recent_transfer_record.dart';
+import '../../../recent_transfers/presentation/providers/recent_transfers_notifier.dart';
 import 'upload_state.dart';
 
 part 'upload_notifier.g.dart';
@@ -242,6 +246,24 @@ class UploadNotifier extends _$UploadNotifier {
           phase: UploadPhase.completed,
           overallProgress: 1.0,
         );
+
+        ref
+            .read(recentTransfersProvider.notifier)
+            .addRecord(
+              RecentTransferRecordModel(
+                id: transfer.id,
+                type: RecentTransferType.sent,
+                fileNames: state.selectedFiles.map((f) => f.name).toList(),
+                totalSize: state.totalSize,
+                timestamp: DateTime.now(),
+                status: 'completed',
+                aesKey: aesKey,
+                filePaths: state.selectedFiles
+                    .where((f) => f.path != null)
+                    .map((f) => f.path!)
+                    .toList(),
+              ),
+            );
       },
       (failure) async {
         state = state.copyWith(

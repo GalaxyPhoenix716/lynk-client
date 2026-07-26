@@ -1,0 +1,229 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:open_filex/open_filex.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/utils/file_size_formatter.dart';
+import '../../../file_transfer/presentation/providers/upload_notifier.dart';
+import '../../domain/entities/recent_transfer_record.dart';
+import '../providers/recent_transfers_notifier.dart';
+
+class RecentTransfersWidget extends ConsumerWidget {
+  const RecentTransfersWidget({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final recentState = ref.watch(recentTransfersProvider);
+
+    return recentState.when(
+      data: (records) {
+        if (records.isEmpty) {
+          return const SizedBox.shrink();
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Recent Activity',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () => _confirmClearHistory(context, ref),
+                  icon: const Icon(Icons.delete_outline, size: 16, color: AppTheme.textSecondary),
+                  label: const Text(
+                    'Clear',
+                    style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: records.length > 5 ? 5 : records.length,
+              separatorBuilder: (_, _) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final item = records[index];
+                return _buildRecentCard(context, ref, item);
+              },
+            ),
+          ],
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (_, _) => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildRecentCard(
+    BuildContext context,
+    WidgetRef ref,
+    RecentTransferRecord item,
+  ) {
+    final isSent = item.type == RecentTransferType.sent;
+    final title = item.fileNames.length == 1
+        ? item.fileNames.first
+        : '${item.fileNames.first} + ${item.fileNames.length - 1} files';
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppTheme.cardBg,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isSent
+              ? AppTheme.primary.withValues(alpha: 0.3)
+              : AppTheme.secondary.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: isSent
+                ? AppTheme.primary.withValues(alpha: 0.15)
+                : AppTheme.secondary.withValues(alpha: 0.15),
+            child: Icon(
+              isSent ? Icons.upload_file : Icons.download_for_offline,
+              color: isSent ? AppTheme.primary : AppTheme.secondary,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${isSent ? 'Sent' : 'Received'} · ${FileSizeFormatter.format(item.totalSize)}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppTheme.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (isSent)
+            ElevatedButton.icon(
+              onPressed: () => _resendFiles(context, ref, item),
+              icon: const Icon(Icons.refresh, size: 14),
+              label: const Text('Re-send', style: TextStyle(fontSize: 12)),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            )
+          else if (item.filePaths != null && item.filePaths!.isNotEmpty)
+            OutlinedButton.icon(
+              onPressed: () => OpenFilex.open(item.filePaths!.first),
+              icon: const Icon(Icons.folder_open, size: 14),
+              label: const Text('Open', style: TextStyle(fontSize: 12)),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _resendFiles(
+    BuildContext context,
+    WidgetRef ref,
+    RecentTransferRecord item,
+  ) async {
+    if (item.filePaths == null || item.filePaths!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Original file locations unavailable for re-sending.'),
+          backgroundColor: AppTheme.error,
+        ),
+      );
+      return;
+    }
+
+    final validFiles = <PlatformFile>[];
+    for (final path in item.filePaths!) {
+      final file = File(path);
+      if (await file.exists()) {
+        final length = await file.length();
+        final name = path.split(Platform.pathSeparator).last;
+        validFiles.add(PlatformFile(name: name, path: path, size: length));
+      }
+    }
+
+    if (validFiles.isEmpty) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Original files were moved or deleted from device.'),
+            backgroundColor: AppTheme.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    ref.read(uploadProvider.notifier).setFilesForTesting(validFiles);
+    if (context.mounted) {
+      context.push('/upload');
+    }
+  }
+
+  void _confirmClearHistory(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.cardBg,
+        title: const Text('Clear History'),
+        content: const Text(
+          'Clear all recent transfer logs? Original files will not be deleted.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              ref.read(recentTransfersProvider.notifier).clearHistory();
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error),
+            child: const Text('Clear All'),
+          ),
+        ],
+      ),
+    );
+  }
+}

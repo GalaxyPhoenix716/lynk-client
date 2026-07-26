@@ -11,6 +11,9 @@ import 'transfer_providers.dart';
 import '../../features/file_receive/domain/usecases/decrypt_file_use_case.dart';
 import '../../features/file_transfer/domain/entities/file_item.dart';
 import '../../features/file_transfer/presentation/providers/upload_notifier.dart';
+import '../../features/recent_transfers/data/models/recent_transfer_record_model.dart';
+import '../../features/recent_transfers/domain/entities/recent_transfer_record.dart';
+import '../../features/recent_transfers/presentation/providers/recent_transfers_notifier.dart';
 
 part 'download_notifier.g.dart';
 
@@ -197,6 +200,21 @@ class DownloadNotifier extends _$DownloadNotifier {
       overallProgress: 1.0,
       downloadedPaths: downloadedPaths,
     );
+
+    ref
+        .read(recentTransfersProvider.notifier)
+        .addRecord(
+          RecentTransferRecordModel(
+            id: state.transfer?.id ?? '',
+            type: RecentTransferType.received,
+            fileNames: downloadFiles.map((f) => f.name).toList(),
+            totalSize: totalSize,
+            timestamp: DateTime.now(),
+            status: 'completed',
+            aesKey: aesKey ?? state.aesKey,
+            filePaths: downloadedPaths,
+          ),
+        );
   }
 
   Future<void> openFile(String path) async {

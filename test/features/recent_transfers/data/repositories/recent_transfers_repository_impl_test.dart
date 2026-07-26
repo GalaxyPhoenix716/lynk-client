@@ -38,34 +38,40 @@ void main() {
       expect(records, isEmpty);
     });
 
-    test('addRecentTransfer saves record and returns list in reverse chronological order', () async {
-      await repository.addRecentTransfer(testRecord1);
-      await repository.addRecentTransfer(testRecord2);
+    test(
+      'addRecentTransfer saves record and returns list in reverse chronological order',
+      () async {
+        await repository.addRecentTransfer(testRecord1);
+        await repository.addRecentTransfer(testRecord2);
 
-      final records = await repository.getRecentTransfers();
-      expect(records.length, equals(2));
-      expect(records.first.id, equals('tx_002')); // Newest first
-      expect(records.last.id, equals('tx_001'));
-    });
+        final records = await repository.getRecentTransfers();
+        expect(records.length, equals(2));
+        expect(records.first.id, equals('tx_002')); // Newest first
+        expect(records.last.id, equals('tx_001'));
+      },
+    );
 
-    test('addRecentTransfer prunes records exceeding max limit of 20 items', () async {
-      for (int i = 1; i <= 25; i++) {
-        await repository.addRecentTransfer(
-          RecentTransferRecordModel(
-            id: 'tx_$i',
-            type: RecentTransferType.sent,
-            fileNames: ['file_$i.png'],
-            totalSize: 1000,
-            timestamp: DateTime.now().add(Duration(minutes: i)),
-            status: 'completed',
-          ),
-        );
-      }
+    test(
+      'addRecentTransfer prunes records exceeding max limit of 20 items',
+      () async {
+        for (int i = 1; i <= 25; i++) {
+          await repository.addRecentTransfer(
+            RecentTransferRecordModel(
+              id: 'tx_$i',
+              type: RecentTransferType.sent,
+              fileNames: ['file_$i.png'],
+              totalSize: 1000,
+              timestamp: DateTime.now().add(Duration(minutes: i)),
+              status: 'completed',
+            ),
+          );
+        }
 
-      final records = await repository.getRecentTransfers();
-      expect(records.length, equals(20));
-      expect(records.first.id, equals('tx_25')); // Newest preserved
-    });
+        final records = await repository.getRecentTransfers();
+        expect(records.length, equals(20));
+        expect(records.first.id, equals('tx_25')); // Newest preserved
+      },
+    );
 
     test('clearAllRecentTransfers wipes all stored records', () async {
       await repository.addRecentTransfer(testRecord1);
