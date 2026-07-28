@@ -106,6 +106,10 @@ class UploadNotifier extends _$UploadNotifier {
     state = UploadState(selectedFiles: files, phase: UploadPhase.selecting);
   }
 
+  void setTransferMode(TransferMode mode) {
+    state = state.copyWith(transferMode: mode);
+  }
+
   void setFilesForTesting(List<PlatformFile> files) {
     state = UploadState(selectedFiles: files, phase: UploadPhase.selecting);
   }

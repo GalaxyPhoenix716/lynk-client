@@ -4,6 +4,8 @@ import '../../domain/entities/transfer.dart';
 
 enum UploadPhase { idle, selecting, uploading, completed, failed, cancelled }
 
+enum TransferMode { p2p, cloud }
+
 class UploadState extends Equatable {
   final List<PlatformFile> selectedFiles;
   final Transfer? transfer;
@@ -15,6 +17,7 @@ class UploadState extends Equatable {
   final UploadPhase phase;
   final String? errorMessage;
   final bool isSizeLimitUnlocked;
+  final TransferMode transferMode;
 
   const UploadState({
     this.selectedFiles = const [],
@@ -27,6 +30,7 @@ class UploadState extends Equatable {
     this.phase = UploadPhase.idle,
     this.errorMessage,
     this.isSizeLimitUnlocked = false,
+    this.transferMode = TransferMode.cloud,
   });
 
   int get totalSize =>
@@ -43,6 +47,7 @@ class UploadState extends Equatable {
     UploadPhase? phase,
     String? errorMessage,
     bool? isSizeLimitUnlocked,
+    TransferMode? transferMode,
   }) {
     return UploadState(
       selectedFiles: selectedFiles ?? this.selectedFiles,
@@ -55,6 +60,7 @@ class UploadState extends Equatable {
       phase: phase ?? this.phase,
       errorMessage: errorMessage ?? this.errorMessage,
       isSizeLimitUnlocked: isSizeLimitUnlocked ?? this.isSizeLimitUnlocked,
+      transferMode: transferMode ?? this.transferMode,
     );
   }
 
@@ -70,5 +76,6 @@ class UploadState extends Equatable {
     phase,
     errorMessage,
     isSizeLimitUnlocked,
+    transferMode,
   ];
 }

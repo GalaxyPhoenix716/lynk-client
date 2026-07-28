@@ -159,23 +159,54 @@ class FileUploadScreen extends ConsumerWidget {
                     },
                   ),
                 ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () => notifier.pickFiles(),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add More Files'),
+                ),
+                const SizedBox(height: 12),
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => notifier.pickFiles(),
-                        child: const Text('+ Add More'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
+                      child: ElevatedButton.icon(
                         onPressed: () {
-                          notifier.startUpload(
-                            attachToSessionId: attachToSessionId,
+                          AdService.showRewardedInterstitialAd(
+                            onRewardGranted: () {
+                              notifier.setTransferMode(TransferMode.cloud);
+                              notifier.startUpload(
+                                attachToSessionId: attachToSessionId,
+                              );
+                            },
                           );
                         },
-                        child: const Text('Initiate Transfer'),
+                        icon: const Icon(Icons.cloud_upload, size: 18),
+                        label: const Text('Cloud Session (10m)'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.secondary,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          AdService.showRewardedAd(
+                            onRewardGranted: () {
+                              notifier.setTransferMode(TransferMode.p2p);
+                              notifier.startUpload(
+                                attachToSessionId: attachToSessionId,
+                              );
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.flash_on, size: 18),
+                        label: const Text('Instant P2P Direct'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
                       ),
                     ),
                   ],

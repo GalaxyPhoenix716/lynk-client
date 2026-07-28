@@ -39,10 +39,17 @@ class RecentTransfersWidget extends ConsumerWidget {
                 ),
                 TextButton.icon(
                   onPressed: () => _confirmClearHistory(context, ref),
-                  icon: const Icon(Icons.delete_outline, size: 16, color: AppTheme.textSecondary),
+                  icon: const Icon(
+                    Icons.delete_outline,
+                    size: 16,
+                    color: AppTheme.textSecondary,
+                  ),
                   label: const Text(
                     'Clear',
-                    style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.textSecondary,
+                    ),
                   ),
                 ),
               ],
